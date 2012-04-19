@@ -112,6 +112,7 @@
     </EmbeddedResource>
     <None Include="Class Diagram.cd" />
     <None Include="MySQLTuner.snk" />
+    <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.ico" />

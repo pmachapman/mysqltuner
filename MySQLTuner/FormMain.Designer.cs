@@ -1,6 +1,15 @@
-﻿namespace MySQLTuner
+﻿// -----------------------------------------------------------------------
+// <copyright file="FormMain.Designer.cs" company="Peter Chapman">
+// Copyright 2012 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace MySQLTuner
 {
-    partial class FormMain
+    /// <summary>
+    /// The Main Form's Designer.
+    /// </summary>
+    public partial class FormMain
     {
         /// <summary>
         /// Required designer variable.
@@ -10,13 +19,14 @@
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        /// <param name="disposing"><c>true</c> if managed resources should be disposed; otherwise, <c>false</c>.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
+            if (disposing && (this.components != null))
             {
-                components.Dispose();
+                this.components.Dispose();
             }
+
             base.Dispose(disposing);
         }
 
@@ -46,4 +56,3 @@
         #endregion
     }
 }
-
