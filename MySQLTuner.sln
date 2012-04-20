@@ -5,34 +5,49 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlTuner", "MySQLTuner\My
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{11307CDA-EE07-4B45-8452-CB75C21464B2}"
 	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
 		MySQLTuner.FxCop = MySQLTuner.FxCop
+		MySQLTuner.vsmdi = MySQLTuner.vsmdi
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{CE870CE9-97C1-402A-8A00-21F0F5B08D83}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlTuner Test Cases", "MySqlTuner Test Cases\MySqlTuner Test Cases.csproj", "{4E0E1065-B769-4177-9BA7-C9E9F232501D}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 2
+		SccNumberOfProjects = 3
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs12
 		SccLocalPath0 = .
-		SccProjectUniqueName1 = MySQLTuner\\MySQLTuner.csproj
+		SccProjectUniqueName1 = MySQLTuner\\MySqlTuner.csproj
 		SccProjectName1 = MySQLTuner
 		SccLocalPath1 = MySQLTuner
+		SccProjectUniqueName2 = MySqlTuner\u0020Test\u0020Cases\\MySqlTuner\u0020Test\u0020Cases.csproj
+		SccProjectName2 = MySqlTuner\u0020Test\u0020Cases
+		SccLocalPath2 = MySqlTuner\u0020Test\u0020Cases
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = MySQLTuner.vsmdi
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
-		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{35C43F05-DA65-4420-98C2-3A53D29235BD}.Debug|x64.ActiveCfg = Debug|x64
-		{35C43F05-DA65-4420-98C2-3A53D29235BD}.Debug|x64.Build.0 = Debug|x64
 		{35C43F05-DA65-4420-98C2-3A53D29235BD}.Debug|x86.ActiveCfg = Debug|x86
 		{35C43F05-DA65-4420-98C2-3A53D29235BD}.Debug|x86.Build.0 = Debug|x86
-		{35C43F05-DA65-4420-98C2-3A53D29235BD}.Release|x64.ActiveCfg = Release|x64
-		{35C43F05-DA65-4420-98C2-3A53D29235BD}.Release|x64.Build.0 = Release|x64
 		{35C43F05-DA65-4420-98C2-3A53D29235BD}.Release|x86.ActiveCfg = Release|x86
 		{35C43F05-DA65-4420-98C2-3A53D29235BD}.Release|x86.Build.0 = Release|x86
+		{4E0E1065-B769-4177-9BA7-C9E9F232501D}.Debug|x86.ActiveCfg = Debug|x86
+		{4E0E1065-B769-4177-9BA7-C9E9F232501D}.Debug|x86.Build.0 = Debug|x86
+		{4E0E1065-B769-4177-9BA7-C9E9F232501D}.Release|x86.ActiveCfg = Release|x86
+		{4E0E1065-B769-4177-9BA7-C9E9F232501D}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

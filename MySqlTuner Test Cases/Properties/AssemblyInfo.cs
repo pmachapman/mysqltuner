@@ -12,11 +12,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MySQL Tuner")]
+[assembly: AssemblyTitle("MySqlTuner Test Cases")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Peter Chapman")]
-[assembly: AssemblyProduct("MySQL Tuner")]
+[assembly: AssemblyProduct("Copyright 2012 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.")]
 [assembly: AssemblyCopyright("Copyright © 2012 Peter Chapman")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -27,7 +27,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f199f8a5-961e-4049-942a-521dfc428cf0")]
+[assembly: Guid("4fcd17b6-f53a-400e-bc06-53c8a8e56d40")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -38,7 +38,6 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: CLSCompliant(true)]
