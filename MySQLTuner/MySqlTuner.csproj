@@ -8,8 +8,8 @@
     <ProjectGuid>{35C43F05-DA65-4420-98C2-3A53D29235BD}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MySQLTuner</RootNamespace>
-    <AssemblyName>MySQLTuner</AssemblyName>
+    <RootNamespace>MySqlTuner</RootNamespace>
+    <AssemblyName>MySqlTuner</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -42,7 +42,7 @@
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\MySQLTuner.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\MySqlTuner.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -55,7 +55,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>MySQLTuner.Program</StartupObject>
+    <StartupObject>MySqlTuner.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>App.ico</ApplicationIcon>
@@ -64,7 +64,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>MySQLTuner.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>MySqlTuner.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -111,7 +111,7 @@
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Class Diagram.cd" />
-    <None Include="MySQLTuner.snk" />
+    <None Include="MySqlTuner.snk" />
     <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>

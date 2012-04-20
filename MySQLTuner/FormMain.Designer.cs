@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace MySQLTuner
+namespace MySqlTuner
 {
     /// <summary>
     /// The Main Form's Designer.

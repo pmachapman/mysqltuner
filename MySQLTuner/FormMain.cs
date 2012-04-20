@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace MySQLTuner
+namespace MySqlTuner
 {
     using System.Windows.Forms;
 
