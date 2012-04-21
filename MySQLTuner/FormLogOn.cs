@@ -58,8 +58,8 @@ namespace MySqlTuner
         private void Ok_Click(object sender, EventArgs e)
         {
             // Get the port
-            int portNumber;
-            if (!int.TryParse(this.port.Text, out portNumber) || portNumber < 0)
+            uint portNumber;
+            if (!uint.TryParse(this.port.Text, out portNumber))
             {
                 portNumber = 3306;
             }

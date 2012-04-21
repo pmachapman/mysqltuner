@@ -7,6 +7,7 @@
 namespace MySqlTuner
 {
     using System;
+    using System.Collections.Generic;
     using MySql.Data.MySqlClient;
 
     /// <summary>
@@ -26,7 +27,8 @@ namespace MySqlTuner
         /// <param name="password">The password.</param>
         /// <param name="host">The host.</param>
         /// <param name="port">The port.</param>
-        public MySqlServer(string userName, string password, string host, int port)
+        [CLSCompliant(false)]
+        public MySqlServer(string userName, string password, string host, uint port)
             : this(userName, password, host)
         {
             this.Port = port;
@@ -80,6 +82,10 @@ namespace MySqlTuner
             {
                 this.Port = 3306;
             }
+
+            // Setup variables
+            this.Variables = new Dictionary<string, string>();
+            this.Status = new Dictionary<string, string>();
         }
 
         /// <summary>Finalizes an instance of the <see cref="MySqlServer"/> class.</summary>
@@ -104,6 +110,21 @@ namespace MySqlTuner
         public string Host { get; set; }
 
         /// <summary>
+        /// Gets a value indicating whether this instance is local.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is local; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsLocal
+        {
+            get
+            {
+                // TODO: A more accurate test than the one below!
+                return this.Host.ToUpper(Settings.Culture) != "LOCALHOST" || this.Host != "127.0.0.1" || this.Host != "::1";
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the last error.
         /// </summary>
         /// <value>
@@ -120,13 +141,40 @@ namespace MySqlTuner
         public string Password { get; set; }
 
         /// <summary>
+        /// Gets or sets the amount of physical memory on the server.
+        /// </summary>
+        /// <value>
+        /// The physical memory.
+        /// </value>
+        [CLSCompliant(false)]
+        public ulong PhysicalMemory { get; set; }
+
+        /// <summary>
         /// Gets or sets the port.
         /// </summary>
         /// <value>
         /// The port.
         /// </value>
         /// <remarks>This should be a <see cref="uint"/>, but <see cref="uint"/> is not CLS compliant.</remarks>
-        public int Port { get; set; }
+        [CLSCompliant(false)]
+        public uint Port { get; set; }
+
+        /// <summary>
+        /// Gets the status.
+        /// </summary>
+        /// <value>
+        /// The status values.
+        /// </value>
+        public Dictionary<string, string> Status { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the size of the swap file
+        /// </summary>
+        /// <value>
+        /// The swap file memory.
+        /// </value>
+        [CLSCompliant(false)]
+        public ulong SwapMemory { get; set; }
 
         /// <summary>
         /// Gets or sets the username.
@@ -135,6 +183,28 @@ namespace MySqlTuner
         /// The username.
         /// </value>
         public string UserName { get; set; }
+
+        /// <summary>
+        /// Gets the variables.
+        /// </summary>
+        /// <value>
+        /// The variables.
+        /// </value>
+        public Dictionary<string, string> Variables { get; private set; }
+
+        /// <summary>
+        /// Gets the server version.
+        /// </summary>
+        /// <value>
+        /// The server version.
+        /// </value>
+        public Version Version
+        {
+            get
+            {
+                return new Version(this.Variables["version"]);
+            }
+        }
 
         /// <summary>
         /// Gets or sets the connection.
@@ -153,6 +223,21 @@ namespace MySqlTuner
             {
                 this.Connection.Close();
             }
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+
+            // This object will be cleaned up by the Dispose method.
+            // Therefore, you should call GC.SupressFinalize to
+            // take this object off the finalization queue
+            // and prevent finalization code for this object
+            // from executing a second time.
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -194,18 +279,93 @@ namespace MySqlTuner
         }
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// Loads this instance.
         /// </summary>
-        public void Dispose()
+        public void Load()
         {
-            this.Dispose(true);
+            // We need to initiate at least one query so that our data is useable
+            string sql = "SELECT VERSION()";
+            MySqlCommand command = new MySqlCommand(sql, this.Connection);
+            command.ExecuteNonQuery();
+            command.Dispose();
 
-            // This object will be cleaned up by the Dispose method.
-            // Therefore, you should call GC.SupressFinalize to
-            // take this object off the finalization queue
-            // and prevent finalization code for this object
-            // from executing a second time.
-            GC.SuppressFinalize(this);
+            // Load the variables
+            sql = "SHOW /*!50000 GLOBAL */ VARIABLES";
+            command = new MySqlCommand(sql, this.Connection);
+            MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                this.Variables.Add(reader[0].ToString(), reader[1].ToString());
+            }
+
+            reader.Close();
+            reader.Dispose();
+            command.Dispose();
+
+            // Load the status
+            sql = "SHOW /*!50000 GLOBAL */ STATUS";
+            command = new MySqlCommand(sql, this.Connection);
+            reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                this.Status.Add(reader[0].ToString(), reader[1].ToString());
+            }
+
+            reader.Close();
+            reader.Dispose();
+            command.Dispose();
+
+            // Workaround for MySQL bug #59393 wrt. ignore-builtin-innodb
+            if (this.Variables.ContainsKey("ignore_builtin_innodb") && this.Variables["ignore_builtin_innodb"] == "ON")
+            {
+                if (this.Variables.ContainsKey("have_innodb"))
+                {
+                    this.Variables["have_innodb"] = "NO";
+                }
+                else
+                {
+                    this.Variables.Add("have_innodb", "NO");
+                }
+            }
+            
+            // have_* for engines is deprecated and will be removed in MySQL 5.6;
+            // check SHOW ENGINES and set corresponding old style variables.
+            // Also works around MySQL bug #59393 wrt. skip-innodb
+            sql = "SHOW ENGINES";
+            command = new MySqlCommand(sql, this.Connection);
+            reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                string engine = reader[0].ToString().ToLower(Settings.Culture);
+                if (engine == "federated" || engine == "blackhole")
+                {
+                    engine += "_engine";
+                }
+                else if (engine == "berkeleydb")
+                {
+                    engine = "bdb";
+                }
+
+                string value = reader[1].ToString();
+                if (value == "DEFAULT")
+                {
+                    value = "YES";
+                }
+
+                string key = "have_" + engine;
+                if (this.Variables.ContainsKey(key))
+                {
+                    this.Variables[key] = value;
+                }
+                else
+                {
+                    this.Variables.Add(key, value);
+                }
+            }
+
+            reader.Close();
+            reader.Dispose();
+            command.Dispose();
         }
 
         /// <summary>

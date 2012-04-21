@@ -185,7 +185,7 @@ namespace MySqlTuner
             // port
             // 
             this.port.Location = new System.Drawing.Point(222, 13);
-            this.port.Mask = "000000";
+            this.port.Mask = "00000";
             this.port.Name = "port";
             this.port.PromptChar = ' ';
             this.port.Size = new System.Drawing.Size(43, 20);
