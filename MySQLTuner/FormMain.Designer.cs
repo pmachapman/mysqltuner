@@ -12,6 +12,11 @@ namespace MySqlTuner
     public partial class FormMain
     {
         /// <summary>
+        /// The close button.
+        /// </summary>
+        private System.Windows.Forms.Button close;
+
+        /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
@@ -57,6 +62,7 @@ namespace MySqlTuner
             this.results = new System.Windows.Forms.DataGridView();
             this.status = new System.Windows.Forms.DataGridViewImageColumn();
             this.notice = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.close = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.results)).BeginInit();
             this.SuspendLayout();
             // 
@@ -76,10 +82,10 @@ namespace MySqlTuner
             this.results.Name = "results";
             this.results.ReadOnly = true;
             this.results.RowHeadersVisible = false;
-            this.results.Size = new System.Drawing.Size(348, 388);
+            this.results.Size = new System.Drawing.Size(293, 316);
             this.results.TabIndex = 0;
             // 
-            // Status
+            // status
             // 
             this.status.HeaderText = "Status";
             this.status.MinimumWidth = 50;
@@ -88,7 +94,7 @@ namespace MySqlTuner
             this.status.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.status.Width = 50;
             // 
-            // Notice
+            // notice
             // 
             this.notice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.notice.HeaderText = "Notice";
@@ -96,15 +102,31 @@ namespace MySqlTuner
             this.notice.Name = "notice";
             this.notice.ReadOnly = true;
             // 
+            // close
+            // 
+            this.close.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.close.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.close.Location = new System.Drawing.Point(230, 334);
+            this.close.Name = "close";
+            this.close.Size = new System.Drawing.Size(75, 23);
+            this.close.TabIndex = 1;
+            this.close.Text = "Close";
+            this.close.UseVisualStyleBackColor = true;
+            this.close.Click += new System.EventHandler(this.Close_Click);
+            // 
             // FormMain
             // 
+            this.AcceptButton = this.close;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(372, 412);
+            this.CancelButton = this.close;
+            this.ClientSize = new System.Drawing.Size(317, 369);
+            this.Controls.Add(this.close);
             this.Controls.Add(this.results);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormMain";
             this.Text = "MySQL Tuner";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.results)).EndInit();
             this.ResumeLayout(false);
 

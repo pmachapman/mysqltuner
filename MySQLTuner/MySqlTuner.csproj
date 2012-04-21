@@ -87,6 +87,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FormLogOn.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormLogOn.Designer.cs">
+      <DependentUpon>FormLogOn.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -101,6 +107,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="MySqlServer.cs" />
+    <EmbeddedResource Include="FormLogOn.resx">
+      <DependentUpon>FormLogOn.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
@@ -118,6 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\App.ico" />
+    <Content Include="Resources\Info.png" />
     <None Include="Resources\Fail.png" />
     <None Include="Resources\Pass.png" />
   </ItemGroup>

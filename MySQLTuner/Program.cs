@@ -20,9 +20,19 @@ namespace MySqlTuner
         [STAThread]
         public static void Main()
         {
+            // Program set up
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormMain());
+
+            // Dispaly the log on form
+            FormLogOn formLogOn = new FormLogOn();
+            Application.Run(formLogOn);
+
+            // If successful, start the main program
+            if (formLogOn.DialogResult == DialogResult.OK)
+            {
+                Application.Run(new FormMain(formLogOn.Server));
+            }
         }
     }
 }

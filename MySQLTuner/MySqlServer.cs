@@ -22,10 +22,23 @@ namespace MySqlTuner
         /// <summary>
         /// Initializes a new instance of the <see cref="MySqlServer"/> class.
         /// </summary>
-        /// <param name="host">The host.</param>
         /// <param name="userName">The username.</param>
         /// <param name="password">The password.</param>
-        public MySqlServer(string host, string userName, string password)
+        /// <param name="host">The host.</param>
+        /// <param name="port">The port.</param>
+        public MySqlServer(string userName, string password, string host, int port)
+            : this(userName, password, host)
+        {
+            this.Port = port;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MySqlServer"/> class.
+        /// </summary>
+        /// <param name="userName">The username.</param>
+        /// <param name="password">The password.</param>
+        /// <param name="host">The host.</param>
+        public MySqlServer(string userName, string password, string host)
             : this(userName, password)
         {
             this.Host = host;
@@ -47,6 +60,7 @@ namespace MySqlTuner
         /// </summary>
         /// <param name="userName">The username.</param>
         public MySqlServer(string userName)
+            : this()
         {
             this.UserName = userName;
         }
@@ -56,6 +70,16 @@ namespace MySqlTuner
         /// </summary>
         public MySqlServer()
         {
+            // Add default values
+            if (string.IsNullOrEmpty(this.Host))
+            {
+                this.Host = "localhost";
+            }
+
+            if (this.Port == 0)
+            {
+                this.Port = 3306;
+            }
         }
 
         /// <summary>Finalizes an instance of the <see cref="MySqlServer"/> class.</summary>
@@ -80,12 +104,29 @@ namespace MySqlTuner
         public string Host { get; set; }
 
         /// <summary>
+        /// Gets or sets the last error.
+        /// </summary>
+        /// <value>
+        /// The last error.
+        /// </value>
+        public string LastError { get; set; }
+
+        /// <summary>
         /// Gets or sets the password.
         /// </summary>
         /// <value>
         /// The password.
         /// </value>
         public string Password { get; set; }
+
+        /// <summary>
+        /// Gets or sets the port.
+        /// </summary>
+        /// <value>
+        /// The port.
+        /// </value>
+        /// <remarks>This should be a <see cref="uint"/>, but <see cref="uint"/> is not CLS compliant.</remarks>
+        public int Port { get; set; }
 
         /// <summary>
         /// Gets or sets the username.
@@ -101,8 +142,7 @@ namespace MySqlTuner
         /// <value>
         /// The connection.
         /// </value>
-        [CLSCompliant(false)]
-        protected MySqlConnection Connection { get; set; }
+        internal MySqlConnection Connection { get; set; }
 
         /// <summary>
         /// Closes this instance.
@@ -123,15 +163,33 @@ namespace MySqlTuner
             // Create the connection string
             MySqlConnectionStringBuilder connectionStringBuilder = new MySqlConnectionStringBuilder();
             connectionStringBuilder.Server = this.Host;
+            connectionStringBuilder.Port = Convert.ToUInt32(this.Port);
             connectionStringBuilder.UserID = this.UserName;
             connectionStringBuilder.Password = this.Password;
 
             // Create the connection
-            string connectionString = connectionStringBuilder.ToString();
-            if (!string.IsNullOrEmpty(connectionString))
+            try
             {
-                this.Connection = new MySqlConnection(connectionStringBuilder.ToString());
-                this.Connection.Open();
+                string connectionString = connectionStringBuilder.ToString();
+                if (!string.IsNullOrEmpty(connectionString))
+                {
+                    this.Connection = new MySqlConnection(connectionStringBuilder.ToString());
+                    this.Connection.Open();
+                }
+            }
+            catch (MySqlException ex)
+            {
+                // Dispose of the connection
+                if (this.Connection != null)
+                {
+                    this.Connection.Dispose();
+                }
+
+                // Set connection to null so it cannot be used
+                this.Connection = null;
+
+                // Set the last error
+                this.LastError = ex.Message;
             }
         }
 
