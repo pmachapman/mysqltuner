@@ -103,7 +103,7 @@ namespace MySqlTuner
             this.PrintMessage(Status.Info, "MySQL Tuner " + Assembly.GetExecutingAssembly().GetName().Version.ToString(2) + " - Peter Chapman <peter@conglomo.co.nz>");
 
             // See if we are runing locally
-            if (this.Server.IsLocal)
+            if (!this.Server.IsLocal)
             {
                 this.PrintMessage(Status.Info, "Performing tests on " + this.Server.Host + ":" + this.Server.Port);
             }
@@ -192,6 +192,12 @@ namespace MySqlTuner
                     }
                 }
             }
+
+            // TODO: Show enabled storage engines
+            // TODO: Display some security recommendations
+            // TODO: Calculate everything we need
+            // TODO: Print the server stats
+            // TODO: Make recommendations based on stats
         }
 
         /// <summary>
