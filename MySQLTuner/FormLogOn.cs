@@ -75,8 +75,8 @@ namespace MySqlTuner
             // Check for errors
             if (!string.IsNullOrEmpty(this.Server.LastError))
             {
-                MessageBox.Show(this.Server.LastError, "Error connecting to server", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
-                this.Server.Dispose();
+                this.WindowState = FormWindowState.Normal;
+                MessageBox.Show(this.Server.LastError, "Error connecting to server", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
             }
             else
             {

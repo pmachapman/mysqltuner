@@ -106,7 +106,7 @@ namespace MySqlTuner
             this.host.Location = new System.Drawing.Point(73, 12);
             this.host.Name = "host";
             this.host.Size = new System.Drawing.Size(110, 20);
-            this.host.TabIndex = 2;
+            this.host.TabIndex = 3;
             this.host.Text = "localhost";
             // 
             // labelServer
@@ -115,7 +115,7 @@ namespace MySqlTuner
             this.labelServer.Location = new System.Drawing.Point(12, 15);
             this.labelServer.Name = "labelServer";
             this.labelServer.Size = new System.Drawing.Size(38, 13);
-            this.labelServer.TabIndex = 0;
+            this.labelServer.TabIndex = 6;
             this.labelServer.Text = "Server";
             // 
             // labelUserName
@@ -124,7 +124,7 @@ namespace MySqlTuner
             this.labelUserName.Location = new System.Drawing.Point(12, 41);
             this.labelUserName.Name = "labelUserName";
             this.labelUserName.Size = new System.Drawing.Size(55, 13);
-            this.labelUserName.TabIndex = 4;
+            this.labelUserName.TabIndex = 7;
             this.labelUserName.Text = "Username";
             // 
             // userName
@@ -132,7 +132,7 @@ namespace MySqlTuner
             this.userName.Location = new System.Drawing.Point(73, 38);
             this.userName.Name = "userName";
             this.userName.Size = new System.Drawing.Size(192, 20);
-            this.userName.TabIndex = 1;
+            this.userName.TabIndex = 5;
             this.userName.Text = "root";
             // 
             // labelPassword
@@ -141,7 +141,7 @@ namespace MySqlTuner
             this.labelPassword.Location = new System.Drawing.Point(12, 67);
             this.labelPassword.Name = "labelPassword";
             this.labelPassword.Size = new System.Drawing.Size(53, 13);
-            this.labelPassword.TabIndex = 6;
+            this.labelPassword.TabIndex = 8;
             this.labelPassword.Text = "Password";
             // 
             // password
@@ -158,7 +158,7 @@ namespace MySqlTuner
             this.labelPort.Location = new System.Drawing.Point(189, 15);
             this.labelPort.Name = "labelPort";
             this.labelPort.Size = new System.Drawing.Size(26, 13);
-            this.labelPort.TabIndex = 2;
+            this.labelPort.TabIndex = 9;
             this.labelPort.Text = "Port";
             // 
             // cancel
@@ -167,7 +167,7 @@ namespace MySqlTuner
             this.cancel.Location = new System.Drawing.Point(190, 90);
             this.cancel.Name = "cancel";
             this.cancel.Size = new System.Drawing.Size(75, 23);
-            this.cancel.TabIndex = 5;
+            this.cancel.TabIndex = 2;
             this.cancel.Text = "Cancel";
             this.cancel.UseVisualStyleBackColor = true;
             this.cancel.Click += new System.EventHandler(this.Cancel_Click);
@@ -177,7 +177,7 @@ namespace MySqlTuner
             this.ok.Location = new System.Drawing.Point(108, 90);
             this.ok.Name = "ok";
             this.ok.Size = new System.Drawing.Size(75, 23);
-            this.ok.TabIndex = 4;
+            this.ok.TabIndex = 1;
             this.ok.Text = "Ok";
             this.ok.UseVisualStyleBackColor = true;
             this.ok.Click += new System.EventHandler(this.Ok_Click);
@@ -189,7 +189,7 @@ namespace MySqlTuner
             this.port.Name = "port";
             this.port.PromptChar = ' ';
             this.port.Size = new System.Drawing.Size(43, 20);
-            this.port.TabIndex = 3;
+            this.port.TabIndex = 4;
             this.port.Text = "3306";
             // 
             // FormLogOn
