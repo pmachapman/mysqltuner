@@ -14,6 +14,7 @@ namespace MySqlTuner
     using System.Windows.Forms;
     using Microsoft.VisualBasic;
     using Microsoft.VisualBasic.Devices;
+    using MySql.Data.MySqlClient;
 
     /// <summary>
     /// The main form.
@@ -36,7 +37,9 @@ namespace MySqlTuner
         public FormMain()
         {
             this.InitializeComponent();
+            this.Calculations = new Dictionary<string, int>();
             this.Recommendations = new List<string>();
+            this.VariablesToAdjust = new List<string>();
         }
 
         /// <summary>
@@ -55,12 +58,28 @@ namespace MySqlTuner
         public MySqlServer Server { get; set; }
 
         /// <summary>
+        /// Gets or sets the calculations.
+        /// </summary>
+        /// <value>
+        /// The calculations.
+        /// </value>
+        private Dictionary<string, int> Calculations { get; set; }
+
+        /// <summary>
         /// Gets or sets the recommendations.
         /// </summary>
         /// <value>
         /// The recommendations.
         /// </value>
         private List<string> Recommendations { get; set; }
+
+        /// <summary>
+        /// Gets or sets the variables to adjust.
+        /// </summary>
+        /// <value>
+        /// The variables to adjust.
+        /// </value>
+        private List<string> VariablesToAdjust { get; set; }
 
         /// <summary>
         /// Prints a message.
@@ -325,15 +344,52 @@ namespace MySqlTuner
                 this.PrintMessage(Status.Pass, "Total fragmented tables: 0");
             }
 
-            // TODO: Display some security recommendations
+            // Display some security recommendations
+            string sql = "SELECT CONCAT(user, '@', host) AS `username` FROM mysql.user WHERE password = '' OR password IS NULL ORDER BY `username`";
+            MySqlCommand command = new MySqlCommand(sql, this.Server.Connection);
+            MySqlDataReader reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    this.PrintMessage(Status.Fail, "User '" + reader[0].ToString() + "' has no password set.");
+                }
+            }
+            else
+            {
+                this.PrintMessage(Status.Pass, "All database users have passwords assigned");
+            }
+
+            reader.Close();
+            reader.Dispose();
+            command.Dispose();
+
             // TODO: Calculate everything we need
             // TODO: Print the server stats
-            // TODO: Make recommendations based on stats
 
-            // Display the recommendations
+            // Make recommendations based on stats
             foreach (string recommendation in this.Recommendations)
             {
                 this.PrintMessage(Status.Recommendation, recommendation);
+            }
+
+            if (this.VariablesToAdjust.Count > 0)
+            {
+                if (this.Calculations.ContainsKey("pct_physical_memory") && this.Calculations["pct_physical_memory"] > 90)
+                {
+                    this.PrintMessage(Status.Info, "MySQL's maximum memory usage is dangerously high");
+                    this.PrintMessage(Status.Info, "Add RAM before increasing MySQL buffer variables");
+                }
+
+                foreach (string variableToAdjust in this.VariablesToAdjust)
+                {
+                    this.PrintMessage(Status.Recommendation, variableToAdjust);
+                }
+            }
+
+            if (this.Recommendations.Count == 0 && this.VariablesToAdjust.Count == 0)
+            {
+                this.PrintMessage(Status.Info, "No additional performance recommendations are available.");
             }
         }
 
