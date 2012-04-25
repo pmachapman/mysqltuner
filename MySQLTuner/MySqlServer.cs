@@ -8,6 +8,7 @@ namespace MySqlTuner
 {
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using MySql.Data.MySqlClient;
 
     /// <summary>
@@ -84,8 +85,10 @@ namespace MySqlTuner
             }
 
             // Setup variables
-            this.Variables = new Dictionary<string, string>();
+            this.EngineCount = new Dictionary<string, int>();
+            this.EngineStatistics = new Dictionary<string, int>();
             this.Status = new Dictionary<string, string>();
+            this.Variables = new Dictionary<string, string>();
         }
 
         /// <summary>Finalizes an instance of the <see cref="MySqlServer"/> class.</summary>
@@ -100,6 +103,30 @@ namespace MySqlTuner
             // readability and maintainability.
             this.Dispose(false);
         }
+
+        /// <summary>
+        /// Gets the engine table count.
+        /// </summary>
+        /// <value>
+        /// The engine table count.
+        /// </value>
+        public Dictionary<string, int> EngineCount { get; private set; }
+
+        /// <summary>
+        /// Gets the engine statistics.
+        /// </summary>
+        /// <value>
+        /// The engine statistics.
+        /// </value>
+        public Dictionary<string, int> EngineStatistics { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the number of fragmented tables.
+        /// </summary>
+        /// <value>
+        /// The fragmented tables count.
+        /// </value>
+        public int FragmentedTables { get; set; }
 
         /// <summary>
         /// Gets or sets the host.
@@ -366,6 +393,166 @@ namespace MySqlTuner
             reader.Close();
             reader.Dispose();
             command.Dispose();
+
+            // Get engine statistics
+            if (this.Version.Major >= 5)
+            {
+                // MySQL 5 servers can have table sizes calculated quickly from information schema
+                sql = "SELECT ENGINE, SUM(DATA_LENGTH), COUNT(ENGINE) FROM information_schema.TABLES WHERE TABLE_SCHEMA NOT IN ('information_schema', 'mysql') AND ENGINE IS NOT NULL GROUP BY ENGINE ORDER BY ENGINE ASC";
+                command = new MySqlCommand(sql, this.Connection);
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    string key = reader[0].ToString();
+                    int size;
+                    if (!int.TryParse(reader[1].ToString(), out size))
+                    {
+                        size = 0;
+                    }
+
+                    int count;
+                    if (!int.TryParse(reader[2].ToString(), out count))
+                    {
+                        count = 0;
+                    }
+
+                    if (size > 0)
+                    {
+                        // Add the size
+                        if (this.EngineStatistics.ContainsKey(key))
+                        {
+                            this.EngineStatistics[key] = size;
+                        }
+                        else
+                        {
+                            this.EngineStatistics.Add(key, size);
+                        }
+
+                        // Add the table count
+                        if (this.EngineCount.ContainsKey(key))
+                        {
+                            this.EngineCount[key] = count;
+                        }
+                        else
+                        {
+                            this.EngineCount.Add(key, count);
+                        }
+                    }
+                }
+
+                reader.Close();
+                reader.Dispose();
+                command.Dispose();
+
+                // Get the number of fragmented tables
+                sql = "SELECT COUNT(TABLE_NAME) FROM information_schema.TABLES WHERE TABLE_SCHEMA NOT IN ('information_schema', 'mysql') AND Data_free > 0 AND NOT ENGINE = 'MEMORY'";
+                command = new MySqlCommand(sql, this.Connection);
+                object scalar = command.ExecuteScalar();
+                if (scalar != null)
+                {
+                    int fragmentedTables;
+                    if (!int.TryParse(scalar.ToString(), out fragmentedTables))
+                    {
+                        fragmentedTables = 0;
+                    }
+
+                    this.FragmentedTables = fragmentedTables;
+                }
+
+                command.Dispose();
+            }
+            else
+            {
+                // MySQL < 5 servers take a lot of work to get table sizes
+                // Now we build a database list, and loop through it to get storage engine stats for tables
+                sql = "SHOW DATABASES";
+                command = new MySqlCommand(sql, this.Connection);
+                DataTable databases = new DataTable();
+                databases.Locale = Settings.Culture;
+                MySqlDataAdapter adapter = new MySqlDataAdapter(command);
+                adapter.Fill(databases);
+                adapter.Dispose();
+                command.Dispose();
+
+                // Reset the engine variables
+                this.EngineCount = new Dictionary<string, int>();
+                this.EngineStatistics = new Dictionary<string, int>();
+                this.FragmentedTables = 0;
+
+                // Go through every database
+                foreach (DataRow row in databases.Rows)
+                {
+                    string database = row[0].ToString();
+                    if (database != "information_schema" && database != "performance_schema")
+                    {
+                        sql = "SHOW TABLE STATUS FROM `" + database + "`";
+                        command = new MySqlCommand(sql, this.Connection);
+                        reader = command.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            string key = reader[1].ToString();
+                            int size;
+                            int dataFree;
+                            if (this.Version.Major == 3 || (this.Version.Major == 4 && this.Version.Minor == 0))
+                            {
+                                // MySQL 3.23/4.0 keeps Data_Length in the 6th column
+                                if (!int.TryParse(reader[5].ToString(), out size))
+                                {
+                                    size = 0;
+                                }
+
+                                if (!int.TryParse(reader[8].ToString(), out dataFree))
+                                {
+                                    dataFree = 0;
+                                }
+                            }
+                            else
+                            {
+                                // MySQL 4.1+ keeps Data_Length in the 7th column
+                                if (!int.TryParse(reader[6].ToString(), out size))
+                                {
+                                    size = 0;
+                                }
+
+                                if (!int.TryParse(reader[9].ToString(), out dataFree))
+                                {
+                                    dataFree = 0;
+                                }
+                            }
+
+                            // Add the size
+                            if (this.EngineStatistics.ContainsKey(key))
+                            {
+                                this.EngineStatistics[key] += size;
+                            }
+                            else
+                            {
+                                this.EngineStatistics.Add(key, size);
+                            }
+
+                            // Add the table count
+                            if (this.EngineCount.ContainsKey(key))
+                            {
+                                this.EngineCount[key]++;
+                            }
+                            else
+                            {
+                                this.EngineCount.Add(key, 1);
+                            }
+
+                            // See if this table is fragmented
+                            if (dataFree > 0)
+                            {
+                                this.FragmentedTables++;
+                            }
+                        }
+
+                        reader.Close();
+                        reader.Dispose();
+                        command.Dispose();
+                    }
+                }
+            }
         }
 
         /// <summary>

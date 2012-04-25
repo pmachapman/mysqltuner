@@ -7,6 +7,7 @@
 namespace MySqlTuner
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Drawing;
     using System.Reflection;
@@ -35,6 +36,7 @@ namespace MySqlTuner
         public FormMain()
         {
             this.InitializeComponent();
+            this.Recommendations = new List<string>();
         }
 
         /// <summary>
@@ -51,6 +53,14 @@ namespace MySqlTuner
         /// The server.
         /// </value>
         public MySqlServer Server { get; set; }
+
+        /// <summary>
+        /// Gets or sets the recommendations.
+        /// </summary>
+        /// <value>
+        /// The recommendations.
+        /// </value>
+        private List<string> Recommendations { get; set; }
 
         /// <summary>
         /// Prints a message.
@@ -82,6 +92,9 @@ namespace MySqlTuner
                     default:
                         statusCell.Value = (Image)Properties.Resources.Info;
                         break;
+                    case Status.Recommendation:
+                        statusCell.Value = (Image)Properties.Resources.Recommendation;
+                        break;
                 }
 
                 row.Cells.Add(statusCell);
@@ -89,6 +102,34 @@ namespace MySqlTuner
                 noticeCell.Value = notice;
                 row.Cells.Add(noticeCell);
                 this.results.Rows.Add(row);
+            }
+        }
+
+        /// <summary>
+        /// Calculates the parameter passed in bytes, and then rounds it to the nearest integer.
+        /// </summary>
+        /// <param name="bytes">The bytes.</param>
+        /// <returns>The bytes formatted and rounded.</returns>
+        private static string DisplayBytesRounded(int bytes)
+        {
+            if (bytes >= Math.Pow(1024, 3))
+            {
+                // GB
+                return (int)(bytes / Math.Pow(1024, 3)) + "G";
+            }
+            else if (bytes >= Math.Pow(1024, 3))
+            {
+                // MB
+                return (int)(bytes / Math.Pow(1024, 2)) + "M";
+            }
+            else if (bytes >= 1024)
+            {
+                // KB
+                return (int)(bytes / 1024) + "K";
+            }
+            else
+            {
+                return bytes + "B";
             }
         }
 
@@ -193,11 +234,107 @@ namespace MySqlTuner
                 }
             }
 
-            // TODO: Show enabled storage engines
+            // Show enabled storage engines
+            if (this.Server.Variables.ContainsKey("have_archive") && this.Server.Variables["have_archive"] == "YES")
+            {
+                this.PrintMessage(Status.Pass, "Archive Engine Installed");
+            }
+            else
+            {
+                this.PrintMessage(Status.Fail, "Archive Engine Not Installed");
+            }
+
+            if (this.Server.Variables.ContainsKey("have_bdb") && this.Server.Variables["have_bdb"] == "YES")
+            {
+                this.PrintMessage(Status.Pass, "Berkeley DB Engine Installed");
+            }
+            else
+            {
+                this.PrintMessage(Status.Fail, "Berkeley DB Engine Not Installed");
+            }
+
+            if (this.Server.Variables.ContainsKey("have_federated_engine") && this.Server.Variables["have_federated_engine"] == "YES")
+            {
+                this.PrintMessage(Status.Pass, "Federated Engine Installed");
+            }
+            else
+            {
+                this.PrintMessage(Status.Fail, "Federated Engine Not Installed");
+            }
+
+            if (this.Server.Variables.ContainsKey("have_innodb") && this.Server.Variables["have_innodb"] == "YES")
+            {
+                this.PrintMessage(Status.Pass, "InnoDB Engine Installed");
+            }
+            else
+            {
+                this.PrintMessage(Status.Fail, "InnoDB Engine Not Installed");
+            }
+
+            if (this.Server.Variables.ContainsKey("have_isam") && this.Server.Variables["have_isam"] == "YES")
+            {
+                this.PrintMessage(Status.Pass, "ISAM Engine Installed");
+            }
+            else
+            {
+                this.PrintMessage(Status.Fail, "ISAM Engine Not Installed");
+            }
+
+            if (this.Server.Variables.ContainsKey("have_ndbcluster") && this.Server.Variables["have_ndbcluster"] == "YES")
+            {
+                this.PrintMessage(Status.Pass, "NDBCLUSTER Engine Installed");
+            }
+            else
+            {
+                this.PrintMessage(Status.Fail, "NDBCLUSTER Engine Not Installed");
+            }
+
+            // Show data in storage engines
+            foreach (KeyValuePair<string, int> engineStatistic in this.Server.EngineStatistics)
+            {
+                this.PrintMessage(Status.Info, "Data in " + engineStatistic.Key + " tables: " + DisplayBytesRounded(engineStatistic.Value) + " (Tables: " + this.Server.EngineCount[engineStatistic.Key] + ")");
+            }
+
+            // If the storage engine isn't being used, recommend it to be disabled
+            if (!this.Server.EngineStatistics.ContainsKey("InnoDB") && this.Server.Variables.ContainsKey("have_innodb") && this.Server.Variables["have_innodb"] == "YES")
+            {
+                this.PrintMessage(Status.Fail, "InnoDB is enabled but isn't being used");
+                this.Recommendations.Add("Add skip-innodb to MySQL configuration to disable InnoDB");
+            }
+
+            if (!this.Server.EngineStatistics.ContainsKey("BerkeleyDB") && this.Server.Variables.ContainsKey("have_bdb") && this.Server.Variables["have_bdb"] == "YES")
+            {
+                this.PrintMessage(Status.Fail, "BDB is enabled but isn't being used");
+                this.Recommendations.Add("Add skip-bdb to MySQL configuration to disable BDB");
+            }
+
+            if (!this.Server.EngineStatistics.ContainsKey("ISAM") && this.Server.Variables.ContainsKey("have_isam") && this.Server.Variables["have_isam"] == "YES")
+            {
+                this.PrintMessage(Status.Fail, "ISAM is enabled but isn't being used");
+                this.Recommendations.Add("Add skip-isam to MySQL configuration to disable ISAM (MySQL > 4.1.0");
+            }
+
+            // Fragmented tables
+            if (this.Server.FragmentedTables > 0)
+            {
+                this.PrintMessage(Status.Fail, "Total fragmented tables: " + this.Server.FragmentedTables);
+                this.Recommendations.Add("Run OPTIMIZE TABLE to defragment tables for better performance");
+            }
+            else
+            {
+                this.PrintMessage(Status.Pass, "Total fragmented tables: 0");
+            }
+
             // TODO: Display some security recommendations
             // TODO: Calculate everything we need
             // TODO: Print the server stats
             // TODO: Make recommendations based on stats
+
+            // Display the recommendations
+            foreach (string recommendation in this.Recommendations)
+            {
+                this.PrintMessage(Status.Recommendation, recommendation);
+            }
         }
 
         /// <summary>

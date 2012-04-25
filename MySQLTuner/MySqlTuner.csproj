@@ -131,6 +131,7 @@
   <ItemGroup>
     <Content Include="Resources\App.ico" />
     <Content Include="Resources\Info.png" />
+    <None Include="Resources\Recommendation.png" />
     <None Include="Resources\Fail.png" />
     <None Include="Resources\Pass.png" />
   </ItemGroup>

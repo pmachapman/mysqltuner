@@ -24,6 +24,11 @@ namespace MySqlTuner
         /// <summary>
         /// The notice is a failure notice.
         /// </summary>
-        Fail = 2
+        Fail = 2,
+
+        /// <summary>
+        /// The notice is a recommendation notice.
+        /// </summary>
+        Recommendation = 3
     }
 }

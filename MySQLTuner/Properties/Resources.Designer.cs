@@ -80,5 +80,12 @@ namespace MySqlTuner.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        internal static System.Drawing.Bitmap Recommendation {
+            get {
+                object obj = ResourceManager.GetObject("Recommendation", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }
