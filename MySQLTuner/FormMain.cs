@@ -364,7 +364,174 @@ namespace MySqlTuner
             reader.Dispose();
             command.Dispose();
 
-            // TODO: Calculate everything we need
+            // Calculate everything we need
+            if (!this.Server.Status.ContainsKey("Questions") || this.Server.Status["Questions"] == "0")
+            {
+                this.PrintMessage(Status.Fail, "Your server has not answered any queries - cannot continue...");
+                return;
+            }
+
+            // Per-thread memory
+            if (this.Server.Version.Major > 3)
+            {
+                this.Calculations.Add("per_thread_buffers", Convert.ToInt32(this.Server.Variables["read_buffer_size"], Settings.Culture) + Convert.ToInt32(this.Server.Variables["read_rnd_buffer_size"], Settings.Culture) + Convert.ToInt32(this.Server.Variables["sort_buffer_size"], Settings.Culture) + Convert.ToInt32(this.Server.Variables["thread_stack"], Settings.Culture) + Convert.ToInt32(this.Server.Variables["join_buffer_size"], Settings.Culture));
+            }
+            else
+            {
+                this.Calculations.Add("per_thread_buffers", Convert.ToInt32(this.Server.Variables["record_buffer"], Settings.Culture) + Convert.ToInt32(this.Server.Variables["record_rnd_buffer"], Settings.Culture) + Convert.ToInt32(this.Server.Variables["sort_buffer"], Settings.Culture) + Convert.ToInt32(this.Server.Variables["thread_stack"], Settings.Culture) + Convert.ToInt32(this.Server.Variables["join_buffer_size"], Settings.Culture));
+            }
+
+            this.Calculations.Add("total_per_thread_buffers", Convert.ToInt32(this.Calculations["per_thread_buffers"], Settings.Culture) * Convert.ToInt32(this.Server.Variables["max_connections"], Settings.Culture));
+            this.Calculations.Add("max_total_per_thread_buffers", Convert.ToInt32(this.Calculations["per_thread_buffers"], Settings.Culture) * Convert.ToInt32(this.Server.Status["Max_used_connections"], Settings.Culture));
+
+            // Server-wide memory
+            this.Calculations.Add("max_tmp_table_size", (Convert.ToInt32(this.Server.Variables["tmp_table_size"], Settings.Culture) > Convert.ToInt32(this.Server.Variables["max_heap_table_size"], Settings.Culture)) ? Convert.ToInt32(this.Server.Variables["max_heap_table_size"], Settings.Culture) : Convert.ToInt32(this.Server.Variables["tmp_table_size"], Settings.Culture));
+            this.Calculations.Add("server_buffers", Convert.ToInt32(this.Server.Variables["key_buffer_size"], Settings.Culture) + Convert.ToInt32(this.Calculations["max_tmp_table_size"], Settings.Culture));
+            this.Calculations["server_buffers"] += this.Server.Variables.ContainsKey("innodb_buffer_pool_size") ? Convert.ToInt32(this.Server.Variables["innodb_buffer_pool_size"], Settings.Culture) : 0;
+            this.Calculations["server_buffers"] += this.Server.Variables.ContainsKey("innodb_additional_mem_pool_size") ? Convert.ToInt32(this.Server.Variables["innodb_additional_mem_pool_size"], Settings.Culture) : 0;
+            this.Calculations["server_buffers"] += this.Server.Variables.ContainsKey("innodb_log_buffer_size") ? Convert.ToInt32(this.Server.Variables["innodb_log_buffer_size"], Settings.Culture) : 0;
+            this.Calculations["server_buffers"] += this.Server.Variables.ContainsKey("query_cache_size") ? Convert.ToInt32(this.Server.Variables["query_cache_size"], Settings.Culture) : 0;
+
+            // Global memory
+            this.Calculations.Add("max_used_memory", this.Calculations["server_buffers"] + this.Calculations["max_total_per_thread_buffers"]);
+            this.Calculations.Add("total_possible_used_memory", this.Calculations["server_buffers"] + this.Calculations["total_per_thread_buffers"]);
+            this.Calculations.Add("pct_physical_memory", Convert.ToInt32((Convert.ToUInt64(this.Calculations["total_possible_used_memory"], Settings.Culture) * 100) / this.Server.PhysicalMemory, Settings.Culture));
+
+            // Slow queries
+            this.Calculations.Add("pct_slow_queries", Convert.ToInt32((Convert.ToInt32(this.Server.Status["Slow_queries"], Settings.Culture) / Convert.ToInt32(this.Server.Status["Questions"], Settings.Culture)) * 100, Settings.Culture));
+
+            // Connections
+            this.Calculations.Add("pct_connections_used", (Convert.ToInt32(this.Server.Status["Max_used_connections"], Settings.Culture) / Convert.ToInt32(this.Server.Variables["max_connections"], Settings.Culture)) * 100);
+            this.Calculations["pct_connections_used"] = (this.Calculations["pct_connections_used"] > 100) ? 100 : this.Calculations["pct_connections_used"];
+
+            // Key buffers
+            if (this.Server.Version.Major > 3 && !(this.Server.Version.Major == 4 && this.Server.Version.Minor == 0))
+            {
+                this.Calculations.Add("pct_key_buffer_used", (1 - ((Convert.ToInt32(this.Server.Status["Key_blocks_unused"], Settings.Culture) * Convert.ToInt32(this.Server.Variables["key_cache_block_size"], Settings.Culture)) / Convert.ToInt32(this.Server.Variables["key_buffer_size"], Settings.Culture))) * 100);
+            }
+
+            if (Convert.ToInt32(this.Server.Status["Key_read_requests"], Settings.Culture) > 0)
+            {
+                this.Calculations.Add("pct_keys_from_mem", (100 - ((Convert.ToInt32(this.Server.Status["Key_reads"], Settings.Culture) / Convert.ToInt32(this.Server.Status["Key_read_requests"], Settings.Culture)) * 100)));
+            }
+            else
+            {
+                this.Calculations.Add("pct_keys_from_mem", 0);
+            }
+
+            // Calculate the number of MyISAM indexes.
+            this.Calculations.Add("total_myisam_indexes", this.Server.TotalMyIsamIndexes);
+
+            // Query cache
+            if (this.Server.Version.Major > 3)
+            {
+                this.Calculations.Add("query_cache_efficiency", (Convert.ToInt32(this.Server.Status["Qcache_hits"], Settings.Culture) / (Convert.ToInt32(this.Server.Status["Com_select"], Settings.Culture) + Convert.ToInt32(this.Server.Status["Qcache_hits"], Settings.Culture))) * 100);
+                if (this.Server.Variables["query_cache_size"] != "0")
+                {
+                    this.Calculations.Add("pct_query_cache_used", 100 - ((Convert.ToInt32(this.Server.Status["Qcache_free_memory"], Settings.Culture) / Convert.ToInt32(this.Server.Variables["query_cache_size"], Settings.Culture)) * 100));
+                }
+
+                if (this.Server.Status["Qcache_lowmem_prunes"] == "0")
+                {
+                    this.Calculations.Add("query_cache_prunes_per_day", 0);
+                }
+                else
+                {
+                    this.Calculations.Add("query_cache_prunes_per_day", Convert.ToInt32(this.Server.Status["Qcache_lowmem_prunes"], Settings.Culture) / (Convert.ToInt32(this.Server.Status["Uptime"], Settings.Culture) / 86400));
+                }
+            }
+
+            // Sorting
+            this.Calculations.Add("total_sorts", Convert.ToInt32(this.Server.Status["Sort_scan"], Settings.Culture) + Convert.ToInt32(this.Server.Status["Sort_range"], Settings.Culture));
+            if (this.Calculations["total_sorts"] > 0)
+            {
+                this.Calculations.Add("pct_temp_sort_table", (Convert.ToInt32(this.Server.Status["Sort_merge_passes"], Settings.Culture) / Convert.ToInt32(this.Calculations["total_sorts"], Settings.Culture)) * 100);
+            }
+
+            // Joins
+            this.Calculations.Add("joins_without_indexes", Convert.ToInt32(this.Server.Status["Select_range_check"], Settings.Culture) + Convert.ToInt32(this.Server.Status["Select_full_join"], Settings.Culture));
+            if (this.Calculations["joins_without_indexes"] > 0)
+            {
+                this.Calculations.Add("joins_without_indexes_per_day", this.Calculations["joins_without_indexes"] / (Convert.ToInt32(this.Server.Status["Uptime"], Settings.Culture) / 86400));
+            }
+            else
+            {
+                this.Calculations.Add("joins_without_indexes_per_day", 0);
+            }
+
+            // Temporary tables
+            if (Convert.ToInt32(this.Server.Status["Created_tmp_tables"], Settings.Culture) > 0)
+            {
+                if (Convert.ToInt32(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture) > 0)
+                {
+                    this.Calculations.Add("pct_temp_disk", (Convert.ToInt32(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture) / (Convert.ToInt32(this.Server.Status["Created_tmp_tables"], Settings.Culture) + Convert.ToInt32(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture))) * 100);
+                }
+                else
+                {
+                    this.Calculations.Add("pct_temp_disk", 0);
+                }
+            }
+
+            // Table cache
+            if (Convert.ToInt32(this.Server.Status["Opened_tables"], Settings.Culture) > 0)
+            {
+                this.Calculations.Add("table_cache_hit_rate", Convert.ToInt32(this.Server.Status["Open_tables"], Settings.Culture) * 100 / Convert.ToInt32(this.Server.Status["Opened_tables"], Settings.Culture));
+            }
+            else
+            {
+                this.Calculations.Add("table_cache_hit_rate", 100);
+            }
+
+            // Open files
+            if (Convert.ToInt32(this.Server.Variables["open_files_limit"], Settings.Culture) > 0)
+            {
+                this.Calculations.Add("pct_files_open", Convert.ToInt32(this.Server.Status["Open_files"], Settings.Culture) * 100 / Convert.ToInt32(this.Server.Variables["open_files_limit"], Settings.Culture));
+            }
+
+            // Table locks
+            if (Convert.ToInt32(this.Server.Status["Table_locks_immediate"], Settings.Culture) > 0)
+            {
+                if (this.Server.Status["Table_locks_waited"] == "0")
+                {
+                    this.Calculations.Add("pct_table_locks_immediate", 100);
+                }
+                else
+                {
+                    this.Calculations.Add("pct_table_locks_immediate", Convert.ToInt32(this.Server.Status["Table_locks_immediate"], Settings.Culture) * 100 / (Convert.ToInt32(this.Server.Status["Table_locks_waited"], Settings.Culture) + Convert.ToInt32(this.Server.Status["Table_locks_immediate"], Settings.Culture)));
+                }
+            }
+
+            // Thread cache
+            this.Calculations.Add("thread_cache_hit_rate", 100 - ((Convert.ToInt32(this.Server.Status["Threads_created"], Settings.Culture) / Convert.ToInt32(this.Server.Status["Connections"], Settings.Culture)) * 100));
+
+            // Other
+            if (Convert.ToInt32(this.Server.Status["Connections"], Settings.Culture) > 0)
+            {
+                this.Calculations.Add("pct_aborted_connections", (Convert.ToInt32(this.Server.Status["Aborted_connects"], Settings.Culture) / Convert.ToInt32(this.Server.Status["Connections"], Settings.Culture)) * 100);
+            }
+            
+            if (Convert.ToInt32(this.Server.Status["Questions"], Settings.Culture) > 0)
+            {
+                this.Calculations.Add("total_reads", Convert.ToInt32(this.Server.Status["Com_select"], Settings.Culture));
+                this.Calculations.Add("total_writes", Convert.ToInt32(this.Server.Status["Com_delete"], Settings.Culture) + Convert.ToInt32(this.Server.Status["Com_insert"], Settings.Culture) + Convert.ToInt32(this.Server.Status["Com_update"], Settings.Culture) + Convert.ToInt32(this.Server.Status["Com_replace"], Settings.Culture));
+                if (this.Calculations["total_reads"] == 0)
+                {
+                    this.Calculations.Add("pct_reads", 0);
+                    this.Calculations.Add("pct_writes", 100);
+                }
+                else
+                {
+                    this.Calculations.Add("pct_reads", (this.Calculations["total_reads"] / (this.Calculations["total_reads"] + this.Calculations["total_writes"])) * 100);
+                    this.Calculations.Add("pct_writes", 100 - this.Calculations["pct_reads"]);
+                }
+            }
+
+            // InnoDB
+            if (this.Server.Variables["have_innodb"] == "YES")
+            {
+                this.Calculations.Add("innodb_log_size_pct", Convert.ToInt32(this.Server.Variables["innodb_log_file_size"], Settings.Culture) * 100 / Convert.ToInt32(this.Server.Variables["innodb_buffer_pool_size"], Settings.Culture));
+            }
+
             // TODO: Print the server stats
 
             // Make recommendations based on stats

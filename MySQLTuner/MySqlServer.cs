@@ -204,6 +204,47 @@ namespace MySqlTuner
         public ulong SwapMemory { get; set; }
 
         /// <summary>
+        /// Gets the total number of MyISAM indexes.
+        /// </summary>
+        public int TotalMyIsamIndexes
+        {
+            get
+            {
+                if (this.IsLocal && this.Version.Major < 5)
+                {
+                    // TODO: Calculate the indexes from the file system
+                    return 0;
+                }
+                else if (this.Version.Major >= 5)
+                {
+                    int totalMyIsamIndexes;
+                    string sql = "SELECT IFNULL(SUM(INDEX_LENGTH),0) FROM information_schema.TABLES WHERE TABLE_SCHEMA NOT IN ('information_schema') AND ENGINE = 'MyISAM'";
+                    MySqlCommand command = new MySqlCommand(sql, this.Connection);
+                    object scalar = command.ExecuteScalar();
+                    if (scalar != null)
+                    {
+                        if (!int.TryParse(scalar.ToString(), out totalMyIsamIndexes))
+                        {
+                            totalMyIsamIndexes = 0;
+                        }
+                    }
+                    else
+                    {
+                        totalMyIsamIndexes = 0;
+                    }
+
+                    command.Dispose();
+                    return totalMyIsamIndexes;
+                }
+                else
+                {
+                    // Unsupported version
+                    return 0;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the username.
         /// </summary>
         /// <value>
