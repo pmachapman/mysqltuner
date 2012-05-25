@@ -412,7 +412,7 @@ namespace MySqlTuner
 
             if (Convert.ToInt32(this.Server.Status["Key_read_requests"], Settings.Culture) > 0)
             {
-                this.Calculations.Add("pct_keys_from_mem", (100 - ((Convert.ToInt32(this.Server.Status["Key_reads"], Settings.Culture) / Convert.ToInt32(this.Server.Status["Key_read_requests"], Settings.Culture)) * 100)));
+                this.Calculations.Add("pct_keys_from_mem", 100 - ((Convert.ToInt32(this.Server.Status["Key_reads"], Settings.Culture) / Convert.ToInt32(this.Server.Status["Key_read_requests"], Settings.Culture)) * 100));
             }
             else
             {
