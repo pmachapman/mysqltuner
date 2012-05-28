@@ -182,7 +182,6 @@ namespace MySqlTuner
         /// <value>
         /// The port.
         /// </value>
-        /// <remarks>This should be a <see cref="uint"/>, but <see cref="uint"/> is not CLS compliant.</remarks>
         [CLSCompliant(false)]
         public uint Port { get; set; }
 

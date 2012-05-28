@@ -20,6 +20,7 @@ namespace MySqlTuner
         {
             get
             {
+                // TODO: Set this to the local culture, allowing override via app.config
                 return CultureInfo.CreateSpecificCulture("en-NZ");
             }
         }

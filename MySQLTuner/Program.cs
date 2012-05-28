@@ -24,7 +24,7 @@ namespace MySqlTuner
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // Dispaly the log on form
+            // Display the log on form
             FormLogOn formLogOn = new FormLogOn();
             Application.Run(formLogOn);
 
