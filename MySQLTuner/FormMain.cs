@@ -227,7 +227,54 @@ namespace MySqlTuner
             // Load the server values from the database
             this.Server.Load();
 
-            // Check for supported or EOL'ed MySQL versions
+            // Check current MySQL version
+            this.ValidateMySqlVersion();
+
+            // Suggest 64-bit upgrade
+            this.CheckArchitecture();
+
+            // Show enabled storage engines
+            this.CheckStorageEngines();
+
+            // Display some security recommendations
+            this.SecurityRecommendations();
+
+            // Calculate everything we need
+            this.PerformCalculations();
+
+            // TODO: Print the server stats
+
+            // Make recommendations based on stats
+            foreach (string recommendation in this.Recommendations)
+            {
+                this.PrintMessage(Status.Recommendation, recommendation);
+            }
+
+            if (this.VariablesToAdjust.Count > 0)
+            {
+                if (this.Calculations.ContainsKey("pct_physical_memory") && this.Calculations["pct_physical_memory"] > 90)
+                {
+                    this.PrintMessage(Status.Info, "MySQL's maximum memory usage is dangerously high");
+                    this.PrintMessage(Status.Info, "Add RAM before increasing MySQL buffer variables");
+                }
+
+                foreach (string variableToAdjust in this.VariablesToAdjust)
+                {
+                    this.PrintMessage(Status.Recommendation, variableToAdjust);
+                }
+            }
+
+            if (this.Recommendations.Count == 0 && this.VariablesToAdjust.Count == 0)
+            {
+                this.PrintMessage(Status.Info, "No additional performance recommendations are available.");
+            }
+        }
+
+        /// <summary>
+        /// Check for supported or EOL'ed MySQL versions.
+        /// </summary>
+        private void ValidateMySqlVersion()
+        {
             if (this.Server.Version.Major < 5)
             {
                 this.PrintMessage(Status.Fail, "Your MySQL version " + this.Server.Variables["version"] + " is EOL software!  Upgrade soon!");
@@ -240,8 +287,13 @@ namespace MySqlTuner
             {
                 this.PrintMessage(Status.Fail, "Currently running unsupported MySQL version " + this.Server.Variables["version"]);
             }
+        }
 
-            // Check if 32-bit or 64-bit architecture, if local machine
+        /// <summary>
+        /// Check if 32-bit or 64-bit architecture, if local machine.
+        /// </summary>
+        private void CheckArchitecture()
+        {
             if (this.Server.IsLocal)
             {
                 if (Environment.Is64BitOperatingSystem)
@@ -260,8 +312,13 @@ namespace MySqlTuner
                     }
                 }
             }
+        }
 
-            // Show enabled storage engines
+        /// <summary>
+        /// Show enabled storage engines.
+        /// </summary>
+        private void CheckStorageEngines()
+        {
             if (this.Server.Variables.ContainsKey("have_archive") && this.Server.Variables["have_archive"] == "YES")
             {
                 this.PrintMessage(Status.Pass, "Archive Engine Installed");
@@ -351,8 +408,13 @@ namespace MySqlTuner
             {
                 this.PrintMessage(Status.Pass, "Total fragmented tables: 0");
             }
+        }
 
-            // Display some security recommendations
+        /// <summary>
+        /// Display some security recommendations.
+        /// </summary>
+        private void SecurityRecommendations()
+        {
             string sql = "SELECT CONCAT(user, '@', host) AS `username` FROM mysql.user WHERE password = '' OR password IS NULL ORDER BY `username`";
             using (MySqlCommand command = new MySqlCommand(sql, this.Server.Connection))
             {
@@ -371,8 +433,14 @@ namespace MySqlTuner
                     }
                 }
             }
+        }
 
-            // Calculate everything we need
+        /// <summary>
+        /// Performs the calculations.
+        /// </summary>
+        private void PerformCalculations()
+        {
+            // See if ther server is responding to our queries
             if (!this.Server.Status.ContainsKey("Questions") || this.Server.Status["Questions"] == "0")
             {
                 this.PrintMessage(Status.Fail, "Your server has not answered any queries - cannot continue...");
@@ -517,7 +585,7 @@ namespace MySqlTuner
             {
                 this.Calculations.Add("pct_aborted_connections", (Convert.ToInt32(this.Server.Status["Aborted_connects"], Settings.Culture) / Convert.ToInt32(this.Server.Status["Connections"], Settings.Culture)) * 100);
             }
-            
+
             if (Convert.ToInt32(this.Server.Status["Questions"], Settings.Culture) > 0)
             {
                 this.Calculations.Add("total_reads", Convert.ToInt32(this.Server.Status["Com_select"], Settings.Culture));
@@ -538,33 +606,6 @@ namespace MySqlTuner
             if (this.Server.Variables["have_innodb"] == "YES")
             {
                 this.Calculations.Add("innodb_log_size_pct", Convert.ToInt32(this.Server.Variables["innodb_log_file_size"], Settings.Culture) * 100 / Convert.ToInt32(this.Server.Variables["innodb_buffer_pool_size"], Settings.Culture));
-            }
-
-            // TODO: Print the server stats
-
-            // Make recommendations based on stats
-            foreach (string recommendation in this.Recommendations)
-            {
-                this.PrintMessage(Status.Recommendation, recommendation);
-            }
-
-            if (this.VariablesToAdjust.Count > 0)
-            {
-                if (this.Calculations.ContainsKey("pct_physical_memory") && this.Calculations["pct_physical_memory"] > 90)
-                {
-                    this.PrintMessage(Status.Info, "MySQL's maximum memory usage is dangerously high");
-                    this.PrintMessage(Status.Info, "Add RAM before increasing MySQL buffer variables");
-                }
-
-                foreach (string variableToAdjust in this.VariablesToAdjust)
-                {
-                    this.PrintMessage(Status.Recommendation, variableToAdjust);
-                }
-            }
-
-            if (this.Recommendations.Count == 0 && this.VariablesToAdjust.Count == 0)
-            {
-                this.PrintMessage(Status.Info, "No additional performance recommendations are available.");
             }
         }
 
