@@ -51,7 +51,6 @@ namespace MySqlTuner.Test
             using (MySqlServer target = new MySqlServer())
             {
                 target.Open();
-                target.Close();
             }
         }
     }

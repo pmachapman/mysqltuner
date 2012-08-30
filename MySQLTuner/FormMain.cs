@@ -97,30 +97,38 @@ namespace MySqlTuner
             else
             {
                 // Setup the cells and add the row
-                DataGridViewRow row = new DataGridViewRow();
-                DataGridViewCell statusCell = new DataGridViewImageCell();
-                switch (status)
+                using (DataGridViewRow row = new DataGridViewRow())
                 {
-                    case Status.Pass:
-                        statusCell.Value = (Image)Properties.Resources.Pass;
-                        break;
-                    case Status.Fail:
-                        statusCell.Value = (Image)Properties.Resources.Fail;
-                        break;
-                    case Status.Info:
-                    default:
-                        statusCell.Value = (Image)Properties.Resources.Info;
-                        break;
-                    case Status.Recommendation:
-                        statusCell.Value = (Image)Properties.Resources.Recommendation;
-                        break;
-                }
+                    using (DataGridViewCell statusCell = new DataGridViewImageCell())
+                    {
+                        switch (status)
+                        {
+                            case Status.Pass:
+                                statusCell.Value = (Image)Properties.Resources.Pass;
+                                break;
+                            case Status.Fail:
+                                statusCell.Value = (Image)Properties.Resources.Fail;
+                                break;
+                            case Status.Info:
+                            default:
+                                statusCell.Value = (Image)Properties.Resources.Info;
+                                break;
+                            case Status.Recommendation:
+                                statusCell.Value = (Image)Properties.Resources.Recommendation;
+                                break;
+                        }
 
-                row.Cells.Add(statusCell);
-                DataGridViewCell noticeCell = new DataGridViewTextBoxCell();
-                noticeCell.Value = notice;
-                row.Cells.Add(noticeCell);
-                this.results.Rows.Add(row);
+                        row.Cells.Add(statusCell);
+                    }
+
+                    using (DataGridViewCell noticeCell = new DataGridViewTextBoxCell())
+                    {
+                        noticeCell.Value = notice;
+                        row.Cells.Add(noticeCell);
+                    }
+
+                    this.results.Rows.Add(row);
+                }
             }
         }
 
@@ -346,23 +354,23 @@ namespace MySqlTuner
 
             // Display some security recommendations
             string sql = "SELECT CONCAT(user, '@', host) AS `username` FROM mysql.user WHERE password = '' OR password IS NULL ORDER BY `username`";
-            MySqlCommand command = new MySqlCommand(sql, this.Server.Connection);
-            MySqlDataReader reader = command.ExecuteReader();
-            if (reader.HasRows)
+            using (MySqlCommand command = new MySqlCommand(sql, this.Server.Connection))
             {
-                while (reader.Read())
+                using (MySqlDataReader reader = command.ExecuteReader())
                 {
-                    this.PrintMessage(Status.Fail, "User '" + reader[0].ToString() + "' has no password set.");
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            this.PrintMessage(Status.Fail, "User '" + reader[0].ToString() + "' has no password set.");
+                        }
+                    }
+                    else
+                    {
+                        this.PrintMessage(Status.Pass, "All database users have passwords assigned");
+                    }
                 }
             }
-            else
-            {
-                this.PrintMessage(Status.Pass, "All database users have passwords assigned");
-            }
-
-            reader.Close();
-            reader.Dispose();
-            command.Dispose();
 
             // Calculate everything we need
             if (!this.Server.Status.ContainsKey("Questions") || this.Server.Status["Questions"] == "0")
