@@ -22,7 +22,7 @@ namespace MySqlTuner
     public partial class FormMain : Form
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="FormMain"/> class.
+        /// Initialises a new instance of the <see cref="FormMain"/> class.
         /// </summary>
         /// <param name="server">The server.</param>
         public FormMain(MySqlServer server)
@@ -32,7 +32,7 @@ namespace MySqlTuner
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FormMain"/> class.
+        /// Initialises a new instance of the <see cref="FormMain"/> class.
         /// </summary>
         public FormMain()
         {
@@ -271,7 +271,7 @@ namespace MySqlTuner
         }
 
         /// <summary>
-        /// Check for supported or EOL'ed MySQL versions.
+        /// Check for supported or end of life MySQL versions.
         /// </summary>
         private void ValidateMySqlVersion()
         {

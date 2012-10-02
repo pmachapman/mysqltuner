@@ -15,7 +15,7 @@ namespace MySqlTuner
     public partial class FormLogOn : Form
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="FormLogOn"/> class.
+        /// Initialises a new instance of the <see cref="FormLogOn"/> class.
         /// </summary>
         public FormLogOn()
         {

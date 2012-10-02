@@ -23,7 +23,7 @@ namespace MySqlTuner
         private bool disposed = false;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MySqlServer"/> class.
+        /// Initialises a new instance of the <see cref="MySqlServer"/> class.
         /// </summary>
         /// <param name="userName">The username.</param>
         /// <param name="password">The password.</param>
@@ -37,7 +37,7 @@ namespace MySqlTuner
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MySqlServer"/> class.
+        /// Initialises a new instance of the <see cref="MySqlServer"/> class.
         /// </summary>
         /// <param name="userName">The username.</param>
         /// <param name="password">The password.</param>
@@ -49,7 +49,7 @@ namespace MySqlTuner
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MySqlServer"/> class.
+        /// Initialises a new instance of the <see cref="MySqlServer"/> class.
         /// </summary>
         /// <param name="userName">The username.</param>
         /// <param name="password">The password.</param>
@@ -60,7 +60,7 @@ namespace MySqlTuner
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MySqlServer"/> class.
+        /// Initialises a new instance of the <see cref="MySqlServer"/> class.
         /// </summary>
         /// <param name="userName">The username.</param>
         public MySqlServer(string userName)
@@ -70,7 +70,7 @@ namespace MySqlTuner
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MySqlServer"/> class.
+        /// Initialises a new instance of the <see cref="MySqlServer"/> class.
         /// </summary>
         public MySqlServer()
         {
@@ -92,9 +92,9 @@ namespace MySqlTuner
             this.Variables = new Dictionary<string, string>();
         }
 
-        /// <summary>Finalizes an instance of the <see cref="MySqlServer"/> class.</summary>
+        /// <summary>Finalises an instance of the <see cref="MySqlServer"/> class.</summary>
         /// <remarks>
-        /// Releases unmanaged resources and performs other cleanup operations before the
+        /// Releases unmanaged resources and performs other clean up operations before the
         /// <see cref="MySqlServer"/> is reclaimed by garbage collection.
         /// </remarks>
         ~MySqlServer()
@@ -615,7 +615,7 @@ namespace MySqlTuner
         ///   </para>
         ///   <para>
         /// If disposing equals false, the method has been called by the
-        /// runtime from inside the finalizer and you should not reference
+        /// runtime from inside the destructor and you should not reference
         /// other objects. Only unmanaged resources can be disposed.
         ///   </para>
         /// </remarks>
