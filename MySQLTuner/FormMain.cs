@@ -811,7 +811,7 @@ namespace MySqlTuner
             }
             else if (!this.Calculations.ContainsKey("total_myisam_indexes") || this.Calculations["total_myisam_indexes"] == 0)
             {
-                this.PrintMessage(Status.Fail, "Cannot calculate MyISAM index size - re-run script as root user");
+                this.PrintMessage(Status.Fail, "Cannot calculate MyISAM index size - please run this program as an Administrator");
             }
             else if (this.Calculations["total_myisam_indexes"] == 0)
             {
