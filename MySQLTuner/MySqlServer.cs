@@ -272,7 +272,13 @@ namespace MySqlTuner
         {
             get
             {
-                return new Version(this.Variables["version"]);
+                string version = this.Variables["version"];
+                if (version.Contains("-"))
+                {
+                    version = version.Split('-')[0];
+                }
+
+                return new Version(version);
             }
         }
 
