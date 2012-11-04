@@ -212,7 +212,7 @@ namespace MySqlTuner
             }
             else
             {
-                return number + "B";
+                return number.ToString(Settings.Culture);
             }
         }
 
