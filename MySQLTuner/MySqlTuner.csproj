@@ -45,7 +45,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\MySqlTuner.xml</DocumentationFile>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>CustomRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -101,6 +101,7 @@
     <Compile Include="FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Status.cs" />
     <Compile Include="Program.cs" />
@@ -123,6 +124,7 @@
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Class Diagram.cd" />
+    <None Include="CustomRules.ruleset" />
     <None Include="MySqlTuner.snk" />
     <None Include="packages.config" />
     <EmbeddedResource Include="Resources\App.manifest">

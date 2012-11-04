@@ -2,7 +2,12 @@
 <Dictionary>
   <Words>
     <Recognized>
+      <Word>Conglomo</Word>
+      <Word>InnoDB</Word>
       <Word>Isam</Word>
+      <Word>MyIsam</Word>
+      <Word>Nz</Word>
+      <Word>Qps</Word>
     </Recognized>
   </Words>
 </Dictionary>

@@ -86,8 +86,8 @@ namespace MySqlTuner
             }
 
             // Setup variables
-            this.EngineCount = new Dictionary<string, int>();
-            this.EngineStatistics = new Dictionary<string, int>();
+            this.EngineCount = new Dictionary<string, long>();
+            this.EngineStatistics = new Dictionary<string, long>();
             this.Status = new Dictionary<string, string>();
             this.Variables = new Dictionary<string, string>();
         }
@@ -111,7 +111,7 @@ namespace MySqlTuner
         /// <value>
         /// The engine table count.
         /// </value>
-        public Dictionary<string, int> EngineCount { get; private set; }
+        public Dictionary<string, long> EngineCount { get; private set; }
 
         /// <summary>
         /// Gets the engine statistics.
@@ -119,7 +119,7 @@ namespace MySqlTuner
         /// <value>
         /// The engine statistics.
         /// </value>
-        public Dictionary<string, int> EngineStatistics { get; private set; }
+        public Dictionary<string, long> EngineStatistics { get; private set; }
 
         /// <summary>
         /// Gets or sets the number of fragmented tables.
@@ -127,7 +127,7 @@ namespace MySqlTuner
         /// <value>
         /// The fragmented tables count.
         /// </value>
-        public int FragmentedTables { get; set; }
+        public long FragmentedTables { get; set; }
 
         /// <summary>
         /// Gets or sets the host.
@@ -206,7 +206,8 @@ namespace MySqlTuner
         /// <summary>
         /// Gets the total number of MyISAM indexes.
         /// </summary>
-        public int TotalMyIsamIndexes
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "MyIsam", Justification = "It is the correct name, not hungarian notation.")]
+        public long TotalMyIsamIndexes
         {
             get
             {
@@ -217,14 +218,14 @@ namespace MySqlTuner
                 }
                 else if (this.Version.Major >= 5)
                 {
-                    int totalMyIsamIndexes;
+                    long totalMyIsamIndexes;
                     string sql = "SELECT IFNULL(SUM(INDEX_LENGTH),0) FROM information_schema.TABLES WHERE TABLE_SCHEMA NOT IN ('information_schema') AND ENGINE = 'MyISAM'";
                     using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
                     {
                         object scalar = command.ExecuteScalar();
                         if (scalar != null)
                         {
-                            if (!int.TryParse(scalar.ToString(), out totalMyIsamIndexes))
+                            if (!long.TryParse(scalar.ToString(), out totalMyIsamIndexes))
                             {
                                 totalMyIsamIndexes = 0;
                             }
@@ -317,7 +318,7 @@ namespace MySqlTuner
             // Create the connection string
             MySqlConnectionStringBuilder connectionStringBuilder = new MySqlConnectionStringBuilder();
             connectionStringBuilder.Server = this.Host;
-            connectionStringBuilder.Port = Convert.ToUInt32(this.Port);
+            connectionStringBuilder.Port = this.Port;
             connectionStringBuilder.UserID = this.UserName;
             connectionStringBuilder.Password = this.Password;
 
@@ -450,14 +451,14 @@ namespace MySqlTuner
                         while (reader.Read())
                         {
                             string key = reader[0].ToString();
-                            int size;
-                            if (!int.TryParse(reader[1].ToString(), out size))
+                            long size;
+                            if (!long.TryParse(reader[1].ToString(), out size))
                             {
                                 size = 0;
                             }
 
-                            int count;
-                            if (!int.TryParse(reader[2].ToString(), out count))
+                            long count;
+                            if (!long.TryParse(reader[2].ToString(), out count))
                             {
                                 count = 0;
                             }
@@ -495,8 +496,8 @@ namespace MySqlTuner
                     object scalar = command.ExecuteScalar();
                     if (scalar != null)
                     {
-                        int fragmentedTables;
-                        if (!int.TryParse(scalar.ToString(), out fragmentedTables))
+                        long fragmentedTables;
+                        if (!long.TryParse(scalar.ToString(), out fragmentedTables))
                         {
                             fragmentedTables = 0;
                         }
@@ -522,8 +523,8 @@ namespace MySqlTuner
                     }
 
                     // Reset the engine variables
-                    this.EngineCount = new Dictionary<string, int>();
-                    this.EngineStatistics = new Dictionary<string, int>();
+                    this.EngineCount = new Dictionary<string, long>();
+                    this.EngineStatistics = new Dictionary<string, long>();
                     this.FragmentedTables = 0;
 
                     // Go through every database
@@ -540,17 +541,17 @@ namespace MySqlTuner
                                     while (reader.Read())
                                     {
                                         string key = reader[1].ToString();
-                                        int size;
-                                        int dataFree;
+                                        long size;
+                                        long dataFree;
                                         if (this.Version.Major == 3 || (this.Version.Major == 4 && this.Version.Minor == 0))
                                         {
                                             // MySQL 3.23/4.0 keeps Data_Length in the 6th column
-                                            if (!int.TryParse(reader[5].ToString(), out size))
+                                            if (!long.TryParse(reader[5].ToString(), out size))
                                             {
                                                 size = 0;
                                             }
 
-                                            if (!int.TryParse(reader[8].ToString(), out dataFree))
+                                            if (!long.TryParse(reader[8].ToString(), out dataFree))
                                             {
                                                 dataFree = 0;
                                             }
@@ -558,12 +559,12 @@ namespace MySqlTuner
                                         else
                                         {
                                             // MySQL 4.1+ keeps Data_Length in the 7th column
-                                            if (!int.TryParse(reader[6].ToString(), out size))
+                                            if (!long.TryParse(reader[6].ToString(), out size))
                                             {
                                                 size = 0;
                                             }
 
-                                            if (!int.TryParse(reader[9].ToString(), out dataFree))
+                                            if (!long.TryParse(reader[9].ToString(), out dataFree))
                                             {
                                                 dataFree = 0;
                                             }
