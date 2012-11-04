@@ -148,7 +148,7 @@ namespace MySqlTuner
             get
             {
                 // TODO: A more accurate test than the one below!
-                return this.Host.ToUpper(Settings.Culture) != "LOCALHOST" || this.Host != "127.0.0.1" || this.Host != "::1";
+                return this.Host.ToUpper(Settings.Culture) == "LOCALHOST" || this.Host == "127.0.0.1" || this.Host == "::1";
             }
         }
 

@@ -172,7 +172,7 @@ namespace MySqlTuner
                 // GB
                 return (long)(bytes / Math.Pow(1024, 3)) + "G";
             }
-            else if (bytes >= Math.Pow(1024, 3))
+            else if (bytes >= Math.Pow(1024, 2))
             {
                 // MB
                 return (long)(bytes / Math.Pow(1024, 2)) + "M";
@@ -200,7 +200,7 @@ namespace MySqlTuner
                 // GB
                 return (long)(number / Math.Pow(1000, 3)) + "G";
             }
-            else if (number >= Math.Pow(1024, 3))
+            else if (number >= Math.Pow(1024, 2))
             {
                 // MB
                 return (long)(number / Math.Pow(1000, 2)) + "M";
@@ -228,7 +228,7 @@ namespace MySqlTuner
                 // GB
                 return (long)(number / Math.Pow(1000, 3)) + "G";
             }
-            else if (number >= Math.Pow(1024, 3))
+            else if (number >= Math.Pow(1024, 2))
             {
                 // MB
                 return (long)(number / Math.Pow(1000, 2)) + "M";
@@ -240,7 +240,7 @@ namespace MySqlTuner
             }
             else
             {
-                return number.ToString("F3", Settings.Culture) + "B";
+                return number.ToString("F3", Settings.Culture);
             }
         }
 
