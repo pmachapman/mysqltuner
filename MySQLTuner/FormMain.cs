@@ -144,7 +144,7 @@ namespace MySqlTuner
                 // GB
                 return (bytes / Math.Pow(1024, 3)).ToString("F1", Settings.Culture) + "G";
             }
-            else if (bytes >= Math.Pow(1024, 3))
+            else if (bytes >= Math.Pow(1024, 2))
             {
                 // MB
                 return (bytes / Math.Pow(1024, 2)).ToString("F1", Settings.Culture) + "M";
@@ -200,7 +200,7 @@ namespace MySqlTuner
                 // GB
                 return (long)(number / Math.Pow(1000, 3)) + "G";
             }
-            else if (number >= Math.Pow(1024, 2))
+            else if (number >= Math.Pow(1000, 2))
             {
                 // MB
                 return (long)(number / Math.Pow(1000, 2)) + "M";
@@ -228,7 +228,7 @@ namespace MySqlTuner
                 // GB
                 return (long)(number / Math.Pow(1000, 3)) + "G";
             }
-            else if (number >= Math.Pow(1024, 2))
+            else if (number >= Math.Pow(1000, 2))
             {
                 // MB
                 return (long)(number / Math.Pow(1000, 2)) + "M";
@@ -280,111 +280,119 @@ namespace MySqlTuner
         /// <param name="e">The <see cref="System.ComponentModel.DoWorkEventArgs"/> instance containing the event data.</param>
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            // Post the first message!
-            this.PrintMessage(Status.Info, "MySQL Tuner " + Assembly.GetExecutingAssembly().GetName().Version.ToString(2) + " - Peter Chapman <peter@conglomo.co.nz>");
+            try
+            {
+                // Post the first message!
+                this.PrintMessage(Status.Info, "MySQL Tuner " + Assembly.GetExecutingAssembly().GetName().Version.ToString(2) + " - Peter Chapman <peter@conglomo.co.nz>");
 
-            // See if we are runing locally
-            if (!this.Server.IsLocal)
-            {
-                this.PrintMessage(Status.Info, "Performing tests on " + this.Server.Host + ":" + this.Server.Port);
-            }
-
-            // See if an empty pasword was used
-            if (string.IsNullOrEmpty(this.Server.Password))
-            {
-                this.PrintMessage(Status.Fail, "Successfully authenticated with no password - SECURITY RISK!");
-            }
-
-            // Get the memory
-            ComputerInfo computerInfo = new ComputerInfo();
-            if (this.Server.IsLocal)
-            {
-                this.Server.PhysicalMemory = computerInfo.TotalPhysicalMemory;
-                this.Server.SwapMemory = computerInfo.TotalVirtualMemory - this.Server.PhysicalMemory;
-            }
-            else
-            {
-                // Ask for the physical memory value
-                ulong physicalMemory;
-                string memory = Interaction.InputBox("How much physical memory is on the server (in megabytes)?");
-                if (string.IsNullOrEmpty(memory) || !ulong.TryParse(memory, out physicalMemory))
+                // See if we are runing locally
+                if (!this.Server.IsLocal)
                 {
-                    this.PrintMessage(Status.Info, "Assuming the same amount of physical memory as this computer");
-                    physicalMemory = computerInfo.TotalPhysicalMemory;
+                    this.PrintMessage(Status.Info, "Performing tests on " + this.Server.Host + ":" + this.Server.Port);
+                }
+
+                // See if an empty pasword was used
+                if (string.IsNullOrEmpty(this.Server.Password))
+                {
+                    this.PrintMessage(Status.Fail, "Successfully authenticated with no password - SECURITY RISK!");
+                }
+
+                // Get the memory
+                ComputerInfo computerInfo = new ComputerInfo();
+                if (this.Server.IsLocal)
+                {
+                    this.Server.PhysicalMemory = computerInfo.TotalPhysicalMemory;
+                    this.Server.SwapMemory = computerInfo.TotalVirtualMemory - this.Server.PhysicalMemory;
                 }
                 else
                 {
-                    this.PrintMessage(Status.Info, "Assuming " + physicalMemory + " MB of physical memory");
-                    physicalMemory *= 1048576;
+                    // Ask for the physical memory value
+                    ulong physicalMemory;
+                    string memory = Interaction.InputBox("How much physical memory is on the server (in megabytes)?");
+                    if (string.IsNullOrEmpty(memory) || !ulong.TryParse(memory, out physicalMemory))
+                    {
+                        this.PrintMessage(Status.Info, "Assuming the same amount of physical memory as this computer");
+                        physicalMemory = computerInfo.TotalPhysicalMemory;
+                    }
+                    else
+                    {
+                        this.PrintMessage(Status.Info, "Assuming " + physicalMemory + " MB of physical memory");
+                        physicalMemory *= 1048576;
+                    }
+
+                    this.Server.PhysicalMemory = physicalMemory;
+
+                    // Ask for the swap memory value
+                    ulong swapMemory;
+                    memory = Interaction.InputBox("How much swap space is on the server (in megabytes)?");
+                    if (string.IsNullOrEmpty(memory) || !ulong.TryParse(memory, out swapMemory))
+                    {
+                        this.PrintMessage(Status.Info, "Assuming the same amount of swap space as this computer");
+                        swapMemory = computerInfo.TotalVirtualMemory - this.Server.PhysicalMemory;
+                    }
+                    else
+                    {
+                        this.PrintMessage(Status.Info, "Assuming " + swapMemory + " MB of swap space");
+                        swapMemory *= 1048576;
+                    }
+
+                    this.Server.SwapMemory = swapMemory;
                 }
 
-                this.Server.PhysicalMemory = physicalMemory;
+                // Load the server values from the database
+                this.Server.Load();
 
-                // Ask for the swap memory value
-                ulong swapMemory;
-                memory = Interaction.InputBox("How much swap space is on the server (in megabytes)?");
-                if (string.IsNullOrEmpty(memory) || !ulong.TryParse(memory, out swapMemory))
+                // Check current MySQL version
+                this.ValidateMySqlVersion();
+
+                // Suggest 64-bit upgrade
+                this.CheckArchitecture();
+
+                // Show enabled storage engines
+                this.CheckStorageEngines();
+
+                // Display some security recommendations
+                this.SecurityRecommendations();
+
+                // Calculate everything we need
+                this.PerformCalculations();
+
+                // Print the server stats
+                this.MySqlStats();
+
+                // Make recommendations based on stats
+                foreach (string recommendation in this.Recommendations)
                 {
-                    this.PrintMessage(Status.Info, "Assuming the same amount of swap space as this computer");
-                    swapMemory = computerInfo.TotalVirtualMemory - this.Server.PhysicalMemory;
-                }
-                else
-                {
-                    this.PrintMessage(Status.Info, "Assuming " + swapMemory + " MB of swap space");
-                    swapMemory *= 1048576;
+                    this.PrintMessage(Status.Recommendation, recommendation);
                 }
 
-                this.Server.SwapMemory = swapMemory;
+                if (this.VariablesToAdjust.Count > 0)
+                {
+                    if (this.Calculations.ContainsKey("pct_physical_memory") && this.Calculations["pct_physical_memory"] > 90)
+                    {
+                        this.PrintMessage(Status.Info, "MySQL's maximum memory usage is dangerously high");
+                        this.PrintMessage(Status.Info, "Add RAM before increasing MySQL buffer variables");
+                    }
+
+                    foreach (string variableToAdjust in this.VariablesToAdjust)
+                    {
+                        this.PrintMessage(Status.Recommendation, variableToAdjust);
+                    }
+                }
+
+                if (this.Recommendations.Count == 0 && this.VariablesToAdjust.Count == 0)
+                {
+                    this.PrintMessage(Status.Info, "No additional performance recommendations are available.");
+                }
+
+                // Complete!
+                this.PrintMessage(Status.Info, "Scan Complete");
             }
-
-            // Load the server values from the database
-            this.Server.Load();
-
-            // Check current MySQL version
-            this.ValidateMySqlVersion();
-
-            // Suggest 64-bit upgrade
-            this.CheckArchitecture();
-
-            // Show enabled storage engines
-            this.CheckStorageEngines();
-
-            // Display some security recommendations
-            this.SecurityRecommendations();
-
-            // Calculate everything we need
-            this.PerformCalculations();
-
-            // Print the server stats
-            this.MySqlStats();
-
-            // Make recommendations based on stats
-            foreach (string recommendation in this.Recommendations)
+            catch (ObjectDisposedException)
             {
-                this.PrintMessage(Status.Recommendation, recommendation);
+                // This is thrown if the form is closed
+                return;
             }
-
-            if (this.VariablesToAdjust.Count > 0)
-            {
-                if (this.Calculations.ContainsKey("pct_physical_memory") && this.Calculations["pct_physical_memory"] > 90)
-                {
-                    this.PrintMessage(Status.Info, "MySQL's maximum memory usage is dangerously high");
-                    this.PrintMessage(Status.Info, "Add RAM before increasing MySQL buffer variables");
-                }
-
-                foreach (string variableToAdjust in this.VariablesToAdjust)
-                {
-                    this.PrintMessage(Status.Recommendation, variableToAdjust);
-                }
-            }
-
-            if (this.Recommendations.Count == 0 && this.VariablesToAdjust.Count == 0)
-            {
-                this.PrintMessage(Status.Info, "No additional performance recommendations are available.");
-            }
-
-            // Complete!
-            this.PrintMessage(Status.Info, "Scan Complete");
         }
 
         /// <summary>
@@ -1064,18 +1072,6 @@ namespace MySqlTuner
         private void Close_Click(object sender, System.EventArgs e)
         {
             this.Close();
-        }
-
-        /// <summary>
-        /// Handles the FormClosing event of the Main form.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Windows.Forms.FormClosingEventArgs"/> instance containing the event data.</param>
-        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            // Clean up
-            this.Server.Close();
-            this.Server.Dispose();
         }
 
         /// <summary>
