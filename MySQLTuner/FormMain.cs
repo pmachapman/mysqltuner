@@ -388,10 +388,21 @@ namespace MySqlTuner
                 // Complete!
                 this.PrintMessage(Status.Info, "Scan Complete");
             }
-            catch (ObjectDisposedException)
+            catch (Exception ex)
             {
-                // This is thrown if the form is closed
-                return;
+                if (ex is ObjectDisposedException)
+                {
+                    // This is thrown if the form is closed
+                    return;
+                }
+                else
+                {
+                    // Display the error to the user
+                    this.PrintMessage(Status.Fail, ex.ToString());
+
+                    // Throw the error, crashing the thread
+                    throw;
+                }
             }
         }
 
@@ -638,7 +649,7 @@ namespace MySqlTuner
                 }
                 else
                 {
-                    this.Calculations.Add("query_cache_prunes_per_day", Convert.ToInt64(this.Server.Status["Qcache_lowmem_prunes"], Settings.Culture) / (Convert.ToInt64(this.Server.Status["Uptime"], Settings.Culture) / 86400));
+                    this.Calculations.Add("query_cache_prunes_per_day", Convert.ToInt64(this.Server.Status["Qcache_lowmem_prunes"], Settings.Culture) / (long)Math.Ceiling(Convert.ToInt64(this.Server.Status["Uptime"], Settings.Culture) / 86400D));
                 }
             }
 
@@ -653,7 +664,7 @@ namespace MySqlTuner
             this.Calculations.Add("joins_without_indexes", Convert.ToInt64(this.Server.Status["Select_range_check"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Select_full_join"], Settings.Culture));
             if (this.Calculations["joins_without_indexes"] > 0)
             {
-                this.Calculations.Add("joins_without_indexes_per_day", this.Calculations["joins_without_indexes"] / (Convert.ToInt64(this.Server.Status["Uptime"], Settings.Culture) / 86400));
+                this.Calculations.Add("joins_without_indexes_per_day", this.Calculations["joins_without_indexes"] / (long)Math.Ceiling(Convert.ToInt64(this.Server.Status["Uptime"], Settings.Culture) / 86400D));
             }
             else
             {
@@ -1034,11 +1045,15 @@ namespace MySqlTuner
             {
                 this.Recommendations.Add("Upgrade to MySQL 4.1+ to use concurrent MyISAM inserts");
             }
-            else if (this.Server.Variables["concurrent_insert"] == "OFF" || this.Server.Variables["concurrent_insert"] == "AUTO")
+            else if (this.Server.Variables["concurrent_insert"] == "NEVER")
+            {
+                this.Recommendations.Add("Enable concurrent_insert by setting it to 'AUTO' OR 'ALWAYS'");
+            }
+            else if (this.Server.Variables["concurrent_insert"] == "OFF")
             {
                 this.Recommendations.Add("Enable concurrent_insert by setting it to 'ON'");
             }
-            else if (Convert.ToInt64(this.Server.Variables["concurrent_insert"], Settings.Culture) == 0)
+            else if (this.Server.Variables["concurrent_insert"] != "ON" && this.Server.Variables["concurrent_insert"] != "AUTO" && this.Server.Variables["concurrent_insert"] != "ALWAYS" && Convert.ToInt64(this.Server.Variables["concurrent_insert"], Settings.Culture) == 0)
             {
                 this.Recommendations.Add("Enable concurrent_insert by setting it to 1");
             }

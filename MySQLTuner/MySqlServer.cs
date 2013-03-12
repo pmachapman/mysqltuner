@@ -10,6 +10,7 @@ namespace MySqlTuner
     using System.Collections.Generic;
     using System.Data;
     using System.Diagnostics.CodeAnalysis;
+    using System.Text.RegularExpressions;
     using MySql.Data.MySqlClient;
 
     /// <summary>
@@ -277,6 +278,9 @@ namespace MySqlTuner
                 {
                     version = version.Split('-')[0];
                 }
+
+                // Strip all non-numbers
+                version = Regex.Replace(version, "[^.0-9]", string.Empty);
 
                 return new Version(version);
             }
