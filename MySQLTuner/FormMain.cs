@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="FormMain.cs" company="Peter Chapman">
-// Copyright 2012 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.
+// Copyright 2013 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -421,7 +421,7 @@ namespace MySqlTuner
         {
             if (this.Server.IsLocal)
             {
-                if (Environment.Is64BitOperatingSystem)
+                if (Settings.Is64BitOperatingSystem)
                 {
                     this.PrintMessage(Status.Pass, "Operating on 64-bit architecture");
                 }
@@ -760,7 +760,7 @@ namespace MySqlTuner
 
             // Memory usage
             this.PrintMessage(Status.Info, "Total buffers: " + DisplayBytes(this.Calculations["server_buffers"]) + " global + " + DisplayBytes(this.Calculations["per_thread_buffers"]) + " per thread (" + this.Server.Variables["max_connections"] + " max threads)");
-            if (this.Calculations["total_possible_used_memory"] > 2147483648 && !Environment.Is64BitOperatingSystem)
+            if (this.Calculations["total_possible_used_memory"] > 2147483648 && !Settings.Is64BitOperatingSystem)
             {
                 this.PrintMessage(Status.Fail, "Allocating > 2GB RAM on 32-bit systems can cause system instability");
                 this.PrintMessage(Status.Fail, "Maximum possible memory usage: " + DisplayBytes(this.Calculations["total_possible_used_memory"]) + " (" + this.Calculations["pct_physical_memory"] + "% of installed RAM)");
@@ -1034,7 +1034,7 @@ namespace MySqlTuner
             {
                 this.Recommendations.Add("Upgrade to MySQL 4.1+ to use concurrent MyISAM inserts");
             }
-            else if (this.Server.Variables["concurrent_insert"] == "OFF")
+            else if (this.Server.Variables["concurrent_insert"] == "OFF" || this.Server.Variables["concurrent_insert"] == "AUTO")
             {
                 this.Recommendations.Add("Enable concurrent_insert by setting it to 'ON'");
             }

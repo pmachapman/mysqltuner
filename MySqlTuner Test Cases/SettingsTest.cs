@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="MySqlServerTest.cs" company="Peter Chapman">
+// <copyright file="SettingsTest.cs" company="Peter Chapman">
 // Copyright 2013 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -10,11 +10,11 @@ namespace MySqlTuner.Test
     using MySqlTuner;
 
     /// <summary>
-    /// This is a test class for <c>MySqlServerTest</c> and is intended
-    /// to contain all <c>MySqlServerTest</c> Unit Tests
+    /// This is a test class for <c>SettingsTest</c> and is intended
+    /// to contain all <c>SettingsTest</c> Unit Tests
     /// </summary>
     [TestClass]
-    public class MySqlServerTest
+    public class SettingsTest
     {
         /// <summary>
         /// The test context instance.
@@ -42,16 +42,13 @@ namespace MySqlTuner.Test
         }
 
         /// <summary>
-        /// A test for Open with no properties set.
+        /// A test for checking if this is a 64-Bit Operating System.
         /// </summary>
         [TestMethod]
-        public void OpenNoPropertiesTest()
+        public void Is64BitOperatingSystemTest()
         {
-            // Test the MySQL server connection
-            using (MySqlServer target = new MySqlServer())
-            {
-                target.Open();
-            }
+            // Test that the Is64BitOperatingSystem property does not crash
+            bool result = Settings.Is64BitOperatingSystem;
         }
     }
 }

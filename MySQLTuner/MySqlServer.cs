@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="MySqlServer.cs" company="Peter Chapman">
-// Copyright 2012 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.
+// Copyright 2013 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="AssemblyInfo.cs" company="Peter Chapman">
-// Copyright 2012 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.
+// Copyright 2013 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -12,12 +12,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MySqlTuner Test Cases")]
+[assembly: AssemblyTitle("MySQL Tuner Test Cases")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Peter Chapman")]
-[assembly: AssemblyProduct("Copyright 2012 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.")]
-[assembly: AssemblyCopyright("Copyright © 2012 Peter Chapman")]
+[assembly: AssemblyProduct("MySQL Tuner Test Cases")]
+[assembly: AssemblyCopyright("Copyright © 2013 Peter Chapman")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
