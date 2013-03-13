@@ -50,6 +50,12 @@ namespace MySqlTuner
         private delegate void PrintDelegate(Status status, string notice);
 
         /// <summary>
+        /// The delegate for showing the progress bar as complete or incomplete
+        /// </summary>
+        /// <param name="visible">if set to <c>true</c>, the progress bar is complete; otherwise <c>false</c>.</param>
+        private delegate void ProgressBarCompleteDelegate(bool visible);
+
+        /// <summary>
         /// Gets or sets the server.
         /// </summary>
         /// <value>
@@ -128,6 +134,33 @@ namespace MySqlTuner
                     }
 
                     this.results.Rows.Add(row);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Shows the progress bar as complete or incomplete.
+        /// </summary>
+        /// <param name="complete">if set to <c>true</c>, the progress bar is complete; otherwise <c>false</c>.</param>
+        public void ProgressComplete(bool complete)
+        {
+            // See if this is is called from another thread
+            if (this.results.InvokeRequired)
+            {
+                ProgressBarCompleteDelegate sd = new ProgressBarCompleteDelegate(this.ProgressComplete);
+                this.Invoke(sd, new object[] { complete });
+            }
+            else
+            {
+                this.progessBarMain.Style = ProgressBarStyle.Continuous;
+                if (complete)
+                {
+                    this.progessBarMain.Value = 100;
+                }
+                else
+                {
+                    // An arbitrary number to show incompletion
+                    this.progessBarMain.Value = 40;
                 }
             }
         }
@@ -387,6 +420,9 @@ namespace MySqlTuner
 
                 // Complete!
                 this.PrintMessage(Status.Info, "Scan Complete");
+
+                // Complete the progress bar
+                this.ProgressComplete(true);
             }
             catch (Exception ex)
             {
@@ -399,6 +435,9 @@ namespace MySqlTuner
                 {
                     // Display the error to the user
                     this.PrintMessage(Status.Fail, ex.ToString());
+
+                    // Show the progress as incomplete
+                    this.ProgressComplete(false);
 
                     // Throw the error, crashing the thread
                     throw;

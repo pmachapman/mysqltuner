@@ -42,6 +42,11 @@ namespace MySqlTuner
         private System.Windows.Forms.DataGridViewTextBoxColumn notice;
 
         /// <summary>
+        /// The main progress bar.
+        /// </summary>
+        private System.Windows.Forms.ProgressBar progessBarMain;
+
+        /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing"><c>true</c> if managed resources should be disposed; otherwise, <c>false</c>.</param>
@@ -69,6 +74,7 @@ namespace MySqlTuner
             this.notice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.close = new System.Windows.Forms.Button();
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
+            this.progessBarMain = new System.Windows.Forms.ProgressBar();
             ((System.ComponentModel.ISupportInitialize)(this.results)).BeginInit();
             this.SuspendLayout();
             // 
@@ -88,7 +94,7 @@ namespace MySqlTuner
             this.results.Name = "results";
             this.results.ReadOnly = true;
             this.results.RowHeadersVisible = false;
-            this.results.Size = new System.Drawing.Size(532, 316);
+            this.results.Size = new System.Drawing.Size(532, 315);
             this.results.TabIndex = 0;
             // 
             // status
@@ -112,7 +118,7 @@ namespace MySqlTuner
             // 
             this.close.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.close.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.close.Location = new System.Drawing.Point(469, 334);
+            this.close.Location = new System.Drawing.Point(469, 337);
             this.close.Name = "close";
             this.close.Size = new System.Drawing.Size(75, 23);
             this.close.TabIndex = 1;
@@ -124,13 +130,23 @@ namespace MySqlTuner
             // 
             this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundWorker_DoWork);
             // 
+            // ProgessBarMain
+            // 
+            this.progessBarMain.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.progessBarMain.Location = new System.Drawing.Point(12, 340);
+            this.progessBarMain.Name = "ProgessBarMain";
+            this.progessBarMain.Size = new System.Drawing.Size(178, 16);
+            this.progessBarMain.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this.progessBarMain.TabIndex = 2;
+            // 
             // FormMain
             // 
             this.AcceptButton = this.close;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.close;
-            this.ClientSize = new System.Drawing.Size(556, 369);
+            this.ClientSize = new System.Drawing.Size(556, 368);
+            this.Controls.Add(this.progessBarMain);
             this.Controls.Add(this.close);
             this.Controls.Add(this.results);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
