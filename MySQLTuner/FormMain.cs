@@ -649,21 +649,21 @@ namespace MySqlTuner
             this.Calculations.Add("pct_physical_memory", Convert.ToInt64((Convert.ToUInt64(this.Calculations["total_possible_used_memory"], Settings.Culture) * 100) / this.Server.PhysicalMemory, Settings.Culture));
 
             // Slow queries
-            this.Calculations.Add("pct_slow_queries", Convert.ToInt64((Convert.ToInt64(this.Server.Status["Slow_queries"], Settings.Culture) / Convert.ToInt64(this.Server.Status["Questions"], Settings.Culture)) * 100, Settings.Culture));
+            this.Calculations.Add("pct_slow_queries", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Slow_queries"], Settings.Culture) / Convert.ToDouble(this.Server.Status["Questions"], Settings.Culture)) * 100D));
 
             // Connections
-            this.Calculations.Add("pct_connections_used", (Convert.ToInt64(this.Server.Status["Max_used_connections"], Settings.Culture) / Convert.ToInt64(this.Server.Variables["max_connections"], Settings.Culture)) * 100);
+            this.Calculations.Add("pct_connections_used", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Max_used_connections"], Settings.Culture) / Convert.ToDouble(this.Server.Variables["max_connections"], Settings.Culture)) * 100D));
             this.Calculations["pct_connections_used"] = (this.Calculations["pct_connections_used"] > 100) ? 100 : this.Calculations["pct_connections_used"];
 
             // Key buffers
             if (this.Server.Version.Major > 3 && !(this.Server.Version.Major == 4 && this.Server.Version.Minor == 0))
             {
-                this.Calculations.Add("pct_key_buffer_used", (1 - ((Convert.ToInt64(this.Server.Status["Key_blocks_unused"], Settings.Culture) * Convert.ToInt64(this.Server.Variables["key_cache_block_size"], Settings.Culture)) / Convert.ToInt64(this.Server.Variables["key_buffer_size"], Settings.Culture))) * 100);
+                this.Calculations.Add("pct_key_buffer_used", (long)Math.Ceiling(1 - ((Convert.ToDouble(this.Server.Status["Key_blocks_unused"], Settings.Culture) * Convert.ToDouble(this.Server.Variables["key_cache_block_size"], Settings.Culture)) / Convert.ToDouble(this.Server.Variables["key_buffer_size"], Settings.Culture))) * 100);
             }
 
             if (Convert.ToInt64(this.Server.Status["Key_read_requests"], Settings.Culture) > 0)
             {
-                this.Calculations.Add("pct_keys_from_mem", 100 - ((Convert.ToInt64(this.Server.Status["Key_reads"], Settings.Culture) / Convert.ToInt64(this.Server.Status["Key_read_requests"], Settings.Culture)) * 100));
+                this.Calculations.Add("pct_keys_from_mem", 100 - (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Key_reads"], Settings.Culture) / Convert.ToDouble(this.Server.Status["Key_read_requests"], Settings.Culture)) * 100D));
             }
             else
             {
@@ -676,10 +676,10 @@ namespace MySqlTuner
             // Query cache
             if (this.Server.Version.Major > 3)
             {
-                this.Calculations.Add("query_cache_efficiency", (Convert.ToInt64(this.Server.Status["Qcache_hits"], Settings.Culture) / (Convert.ToInt64(this.Server.Status["Com_select"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Qcache_hits"], Settings.Culture))) * 100);
+                this.Calculations.Add("query_cache_efficiency", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Qcache_hits"], Settings.Culture) / (Convert.ToDouble(this.Server.Status["Com_select"], Settings.Culture) + Convert.ToDouble(this.Server.Status["Qcache_hits"], Settings.Culture))) * 100D));
                 if (this.Server.Variables["query_cache_size"] != "0")
                 {
-                    this.Calculations.Add("pct_query_cache_used", 100 - ((Convert.ToInt64(this.Server.Status["Qcache_free_memory"], Settings.Culture) / Convert.ToInt64(this.Server.Variables["query_cache_size"], Settings.Culture)) * 100));
+                    this.Calculations.Add("pct_query_cache_used", 100 - (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Qcache_free_memory"], Settings.Culture) / Convert.ToDouble(this.Server.Variables["query_cache_size"], Settings.Culture)) * 100));
                 }
 
                 if (this.Server.Status["Qcache_lowmem_prunes"] == "0")
@@ -696,7 +696,7 @@ namespace MySqlTuner
             this.Calculations.Add("total_sorts", Convert.ToInt64(this.Server.Status["Sort_scan"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Sort_range"], Settings.Culture));
             if (this.Calculations["total_sorts"] > 0)
             {
-                this.Calculations.Add("pct_temp_sort_table", (Convert.ToInt64(this.Server.Status["Sort_merge_passes"], Settings.Culture) / Convert.ToInt64(this.Calculations["total_sorts"], Settings.Culture)) * 100);
+                this.Calculations.Add("pct_temp_sort_table", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Sort_merge_passes"], Settings.Culture) / Convert.ToDouble(this.Calculations["total_sorts"], Settings.Culture)) * 100D));
             }
 
             // Joins
@@ -715,7 +715,7 @@ namespace MySqlTuner
             {
                 if (Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture) > 0)
                 {
-                    this.Calculations.Add("pct_temp_disk", (Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture) / (Convert.ToInt64(this.Server.Status["Created_tmp_tables"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture))) * 100);
+                    this.Calculations.Add("pct_temp_disk", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture) / (Convert.ToDouble(this.Server.Status["Created_tmp_tables"], Settings.Culture) + Convert.ToDouble(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture))) * 100D));
                 }
                 else
                 {
@@ -753,12 +753,12 @@ namespace MySqlTuner
             }
 
             // Thread cache
-            this.Calculations.Add("thread_cache_hit_rate", 100 - ((Convert.ToInt64(this.Server.Status["Threads_created"], Settings.Culture) / Convert.ToInt64(this.Server.Status["Connections"], Settings.Culture)) * 100));
+            this.Calculations.Add("thread_cache_hit_rate", 100 - (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Threads_created"], Settings.Culture) / Convert.ToDouble(this.Server.Status["Connections"], Settings.Culture)) * 100D));
 
             // Other
             if (Convert.ToInt64(this.Server.Status["Connections"], Settings.Culture) > 0)
             {
-                this.Calculations.Add("pct_aborted_connections", (Convert.ToInt64(this.Server.Status["Aborted_connects"], Settings.Culture) / Convert.ToInt64(this.Server.Status["Connections"], Settings.Culture)) * 100);
+                this.Calculations.Add("pct_aborted_connections", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Aborted_connects"], Settings.Culture) / Convert.ToDouble(this.Server.Status["Connections"], Settings.Culture)) * 100D));
             }
 
             if (Convert.ToInt64(this.Server.Status["Questions"], Settings.Culture) > 0)
@@ -772,7 +772,7 @@ namespace MySqlTuner
                 }
                 else
                 {
-                    this.Calculations.Add("pct_reads", (this.Calculations["total_reads"] / (this.Calculations["total_reads"] + this.Calculations["total_writes"])) * 100);
+                    this.Calculations.Add("pct_reads", (long)Math.Ceiling((Convert.ToDouble(this.Calculations["total_reads"]) / Convert.ToDouble(this.Calculations["total_reads"] + this.Calculations["total_writes"])) * 100D));
                     this.Calculations.Add("pct_writes", 100 - this.Calculations["pct_reads"]);
                 }
             }
