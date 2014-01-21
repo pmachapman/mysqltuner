@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="FormLogOn.Designer.cs" company="Peter Chapman">
-// Copyright 2013 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.
+// Copyright 2014 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 
