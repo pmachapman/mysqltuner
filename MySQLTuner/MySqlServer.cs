@@ -332,6 +332,10 @@ namespace MySqlTuner
             connectionStringBuilder.UserID = this.UserName;
             connectionStringBuilder.Password = this.Password;
 
+            // Stop any time out issues
+            connectionStringBuilder.ConnectionTimeout = 0;
+            connectionStringBuilder.DefaultCommandTimeout = 0;
+
             // Create the connection
             try
             {
