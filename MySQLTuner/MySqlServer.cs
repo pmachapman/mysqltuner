@@ -333,7 +333,7 @@ namespace MySqlTuner
             connectionStringBuilder.Password = this.Password;
 
             // Stop any time out issues
-            connectionStringBuilder.ConnectionTimeout = 0;
+            connectionStringBuilder.ConnectionTimeout = 30;
             connectionStringBuilder.DefaultCommandTimeout = 0;
 
             // Create the connection
@@ -413,7 +413,7 @@ namespace MySqlTuner
                     this.Variables.Add("have_innodb", "NO");
                 }
             }
-            
+
             // have_* for engines is deprecated and will be removed in MySQL 5.6;
             // check SHOW ENGINES and set corresponding old style variables.
             // Also works around MySQL bug #59393 wrt. skip-innodb
