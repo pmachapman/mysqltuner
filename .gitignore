@@ -2,10 +2,11 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-*.user
+*.old
 *.suo
+*.user
 /MySQLTuner/bin
-/MySQLTuner/obj/x86
+/MySQLTuner/obj
 /MySqlTuner Test Cases/bin
 /MySqlTuner Test Cases/obj
 /packages
