@@ -93,7 +93,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\App.manifest" />
-    <None Include="app.config" />
     <None Include="Class Diagram.cd" />
     <None Include="MySqlTuner.Test.snk" />
     <None Include="packages.config" />

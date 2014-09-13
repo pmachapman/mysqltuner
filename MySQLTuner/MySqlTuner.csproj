@@ -121,7 +121,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="app.config" />
     <None Include="Class Diagram.cd" />
     <None Include="CustomRules.ruleset" />
     <None Include="MySqlTuner.snk" />
