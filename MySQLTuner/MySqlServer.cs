@@ -345,19 +345,27 @@ namespace MySqlTuner
                     this.Connection.Open();
                 }
             }
-            catch (MySqlException ex)
+            catch (Exception ex)
             {
-                // Dispose of the connection
-                if (this.Connection != null)
+                if (ex is MySqlException
+                    || ex is NotSupportedException)
                 {
-                    this.Connection.Dispose();
+                    // Dispose of the connection
+                    if (this.Connection != null)
+                    {
+                        this.Connection.Dispose();
+                    }
+
+                    // Set connection to null so it cannot be used
+                    this.Connection = null;
+
+                    // Set the last error
+                    this.LastError = ex.Message;
                 }
-
-                // Set connection to null so it cannot be used
-                this.Connection = null;
-
-                // Set the last error
-                this.LastError = ex.Message;
+                else
+                {
+                    throw;
+                }
             }
         }
 
