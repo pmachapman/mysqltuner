@@ -920,7 +920,7 @@ namespace MySqlTuner
                     this.PrintMessage(Status.Fail, "Table cache hit rate: " + this.Calculations["table_cache_hit_rate"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Open_tables"], CultureInfo.CurrentCulture)) + " open / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Opened_tables"], CultureInfo.CurrentCulture)) + " opened)");
                     if (this.Server.Version.Major > 5 || (this.Server.Version.Major == 5 && this.Server.Version.Minor >= 1))
                     {
-                        this.VariablesToAdjust.Add("table_cache (> " + this.Server.Variables["table_open_cache"] + ")");
+                        this.VariablesToAdjust.Add("table_open_cache (> " + this.Server.Variables["table_open_cache"] + ")");
                     }
                     else
                     {
