@@ -111,6 +111,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="MySqlServer.cs" />
+    <Compile Include="TuningCalculator.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <EmbeddedResource Include="FormLogOn.resx">
       <DependentUpon>FormLogOn.cs</DependentUpon>
     </EmbeddedResource>
@@ -131,7 +134,9 @@
     <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>
-    <CodeAnalysisDictionary Include="CustomDictionary.xml" />
+    <CodeAnalysisDictionary Include="CustomDictionary.xml">
+      <SubType>Designer</SubType>
+    </CodeAnalysisDictionary>
     <Content Include="Resources\App.ico" />
     <Content Include="Resources\Info.png" />
     <None Include="Resources\Recommendation.png" />

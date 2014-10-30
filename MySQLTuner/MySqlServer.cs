@@ -8,7 +8,6 @@ namespace MySqlTuner
 {
     using System;
     using System.Collections.Generic;
-    using System.Data;
     using System.Diagnostics.CodeAnalysis;
     using System.Text.RegularExpressions;
     using MySql.Data.MySqlClient;
@@ -365,6 +364,7 @@ namespace MySqlTuner
         /// <summary>
         /// Loads this instance.
         /// </summary>
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "This is a complex routine")]
         [SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "The value in the query comes from the MySQL System tables.")]
         public void Load()
         {
@@ -524,91 +524,90 @@ namespace MySqlTuner
             {
                 // MySQL < 5 servers take a lot of work to get table sizes
                 // Now we build a database list, and loop through it to get storage engine stats for tables
-                using (DataTable databases = new DataTable())
+                List<string> databases = new List<string>();
+                sql = "SHOW DATABASES";
+                using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
                 {
-                    databases.Locale = Settings.Culture;
-                    sql = "SHOW DATABASES";
-                    using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
+                    using (MySqlDataReader reader = command.ExecuteReader())
                     {
-                        using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
+                        while (reader.Read())
                         {
-                            adapter.Fill(databases);
+                            databases.Add(reader[0].ToString());
                         }
                     }
+                }
 
-                    // Reset the engine variables
-                    this.EngineCount = new Dictionary<string, long>();
-                    this.EngineStatistics = new Dictionary<string, long>();
-                    this.FragmentedTables = 0;
+                // Reset the engine variables
+                this.EngineCount = new Dictionary<string, long>();
+                this.EngineStatistics = new Dictionary<string, long>();
+                this.FragmentedTables = 0;
 
-                    // Go through every database
-                    foreach (DataRow row in databases.Rows)
+                // Go through every database
+                foreach (string database in databases)
+                {
+                    if (database != "information_schema" && database != "performance_schema")
                     {
-                        string database = row[0].ToString();
-                        if (database != "information_schema" && database != "performance_schema")
+                        sql = "SHOW TABLE STATUS FROM `" + database + "`";
+                        using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
                         {
-                            sql = "SHOW TABLE STATUS FROM `" + database + "`";
-                            using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
+                            using (MySqlDataReader reader = command.ExecuteReader())
                             {
-                                using (MySqlDataReader reader = command.ExecuteReader())
+                                while (reader.Read())
                                 {
-                                    while (reader.Read())
+                                    string key = reader[1].ToString();
+                                    long size;
+                                    long dataFree;
+                                    if (this.Version.Major == 3 || (this.Version.Major == 4 && this.Version.Minor == 0))
                                     {
-                                        string key = reader[1].ToString();
-                                        long size;
-                                        long dataFree;
-                                        if (this.Version.Major == 3 || (this.Version.Major == 4 && this.Version.Minor == 0))
+                                        // MySQL 3.23/4.0 keeps Data_Length in the 6th column
+                                        if (!long.TryParse(reader[5].ToString(), out size))
                                         {
-                                            // MySQL 3.23/4.0 keeps Data_Length in the 6th column
-                                            if (!long.TryParse(reader[5].ToString(), out size))
-                                            {
-                                                size = 0;
-                                            }
-
-                                            if (!long.TryParse(reader[8].ToString(), out dataFree))
-                                            {
-                                                dataFree = 0;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            // MySQL 4.1+ keeps Data_Length in the 7th column
-                                            if (!long.TryParse(reader[6].ToString(), out size))
-                                            {
-                                                size = 0;
-                                            }
-
-                                            if (!long.TryParse(reader[9].ToString(), out dataFree))
-                                            {
-                                                dataFree = 0;
-                                            }
+                                            size = 0;
                                         }
 
-                                        // Add the size
-                                        if (this.EngineStatistics.ContainsKey(key))
+                                        if (!long.TryParse(reader[8].ToString(), out dataFree))
                                         {
-                                            this.EngineStatistics[key] += size;
+                                            dataFree = 0;
                                         }
-                                        else
+                                    }
+                                    else
+                                    {
+                                        // MySQL 4.1+ keeps Data_Length in the 7th column
+                                        if (!long.TryParse(reader[6].ToString(), out size))
                                         {
-                                            this.EngineStatistics.Add(key, size);
-                                        }
-
-                                        // Add the table count
-                                        if (this.EngineCount.ContainsKey(key))
-                                        {
-                                            this.EngineCount[key]++;
-                                        }
-                                        else
-                                        {
-                                            this.EngineCount.Add(key, 1);
+                                            size = 0;
                                         }
 
-                                        // See if this table is fragmented
-                                        if (dataFree > 0)
+                                        if (!long.TryParse(reader[9].ToString(), out dataFree))
                                         {
-                                            this.FragmentedTables++;
+                                            dataFree = 0;
                                         }
+                                    }
+
+                                    // Add the size
+                                    if (this.EngineStatistics.ContainsKey(key))
+                                    {
+                                        this.EngineStatistics[key] += size;
+                                    }
+                                    else
+                                    {
+                                        this.EngineStatistics.Add(key, size);
+                                    }
+
+                                    // Add the table count
+                                    if (this.EngineCount.ContainsKey(key))
+                                    {
+                                        this.EngineCount[key]++;
+                                    }
+                                    else
+                                    {
+                                        this.EngineCount.Add(key, 1);
+                                    }
+
+                                    // See if this table is fragmented
+                                    if (dataFree > 0)
+                                    {
+                                        this.FragmentedTables++;
                                     }
                                 }
                             }

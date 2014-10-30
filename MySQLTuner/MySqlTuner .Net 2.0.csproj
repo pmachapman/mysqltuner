@@ -112,6 +112,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="MySqlServer.cs" />
+    <Compile Include="TuningCalculator.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <EmbeddedResource Include="FormLogOn.resx">
       <DependentUpon>FormLogOn.cs</DependentUpon>
     </EmbeddedResource>
