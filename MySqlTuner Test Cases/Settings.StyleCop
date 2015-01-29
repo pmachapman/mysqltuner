@@ -6,7 +6,7 @@
     <Analyzer AnalyzerId="StyleCop.CSharp.DocumentationRules">
       <AnalyzerSettings>
         <StringProperty Name="CompanyName">Peter Chapman</StringProperty>
-        <StringProperty Name="Copyright">Copyright 2014 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.</StringProperty>
+        <StringProperty Name="Copyright">Copyright 2015 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.</StringProperty>
       </AnalyzerSettings>
     </Analyzer>
   </Analyzers>
