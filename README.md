@@ -18,4 +18,5 @@ Easily view how your MySQL server can be optimised in a clear, easy to read dial
 * Microsoft .NET Framework 4.0 (http://www.microsoft.com/en-us/download/details.aspx?id=17851), or
 * Microsoft .NET Framework 2.0 (for the alternate download)
 * MySQL Server 5.0 or higher, installed either locally or remotely
+
 Finally, this program is supplied AS IS, with no warranty or support of any kind.
