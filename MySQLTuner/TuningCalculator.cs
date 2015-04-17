@@ -179,7 +179,7 @@ namespace MySqlTuner
                 }
 
                 // Complete!
-                this.PrintMessage(Status.Info, "Scan Complete");
+                this.PrintMessage(Status.Info, "Scan Completed at " + DateTime.Now.ToString(Settings.Culture.DateTimeFormat.FullDateTimePattern, Settings.Culture));
 
                 // Complete the progress bar
                 this.ProgressComplete(true);
