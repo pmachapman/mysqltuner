@@ -387,7 +387,7 @@ namespace MySqlTuner
             }
             else
             {
-                this.PrintMessage(Status.Fail, "Berkeley DB Engine Not Installed");
+                this.PrintMessage(Status.Info, "Berkeley DB Engine Not Installed");
             }
 
             if (this.Server.Variables.ContainsKey("have_federated_engine") && this.Server.Variables["have_federated_engine"] == "YES")
