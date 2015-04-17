@@ -85,7 +85,7 @@ namespace MySqlTuner
                 this.PrintMessage(Status.Info, "MySQL Tuner " + Assembly.GetExecutingAssembly().GetName().Version.ToString(2) + " - Peter Chapman <peter@conglomo.co.nz>");
 
                 // Show the server
-                this.PrintMessage(Status.Info, "Performing tests on " + this.Server.Host + ":" + this.Server.Port);
+                this.PrintMessage(Status.Info, "Performing tests on " + this.Server.Host + ":" + this.Server.Port + " at " + DateTime.Now.ToString(Settings.Culture.DateTimeFormat.FullDateTimePattern, Settings.Culture));
 
                 // See if an empty password was used
                 if (string.IsNullOrEmpty(this.Server.Password))
