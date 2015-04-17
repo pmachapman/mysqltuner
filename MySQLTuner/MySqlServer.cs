@@ -391,7 +391,15 @@ namespace MySqlTuner
                 {
                     while (reader.Read())
                     {
-                        this.Variables.Add(reader[0].ToString(), reader[1].ToString());
+                        string key = reader[0].ToString();
+                        if (this.Variables.ContainsKey(key))
+                        {
+                            this.Variables[key] = reader[1].ToString();
+                        }
+                        else
+                        {
+                            this.Variables.Add(key, reader[1].ToString());
+                        }
                     }
                 }
             }
@@ -404,7 +412,15 @@ namespace MySqlTuner
                 {
                     while (reader.Read())
                     {
-                        this.Status.Add(reader[0].ToString(), reader[1].ToString());
+                        string key = reader[0].ToString();
+                        if (this.Status.ContainsKey(key))
+                        {
+                            this.Status[key] = reader[1].ToString();
+                        }
+                        else
+                        {
+                            this.Status.Add(key, reader[1].ToString());
+                        }
                     }
                 }
             }
