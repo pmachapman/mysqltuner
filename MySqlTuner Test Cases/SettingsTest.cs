@@ -49,6 +49,7 @@ namespace MySqlTuner.Test
         {
             // Test that the Is64BitOperatingSystem property does not crash
             bool result = Settings.Is64BitOperatingSystem;
+            Assert.IsTrue(result);
         }
     }
 }

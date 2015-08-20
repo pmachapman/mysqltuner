@@ -1,45 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
+# Visual Studio 2015
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlTuner", "MySQLTuner\MySqlTuner.csproj", "{35C43F05-DA65-4420-98C2-3A53D29235BD}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{11307CDA-EE07-4B45-8452-CB75C21464B2}"
-	ProjectSection(SolutionItems) = preProject
-		Local.testsettings = Local.testsettings
-		MySQLTuner.vsmdi = MySQLTuner.vsmdi
-		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlTuner Test Cases", "MySqlTuner Test Cases\MySqlTuner Test Cases.csproj", "{4E0E1065-B769-4177-9BA7-C9E9F232501D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlTuner .Net 2.0", "MySQLTuner\MySqlTuner .Net 2.0.csproj", "{5AEEF329-5BA7-43E7-8A93-22BF84120A73}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{5F0C8619-0A8F-4A07-BEC9-24FC93C1C68A}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 4
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs12
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = MySQLTuner\\MySqlTuner.csproj
-		SccProjectName1 = MySQLTuner
-		SccLocalPath1 = MySQLTuner
-		SccProjectUniqueName2 = MySqlTuner\u0020Test\u0020Cases\\MySqlTuner\u0020Test\u0020Cases.csproj
-		SccProjectName2 = MySqlTuner\u0020Test\u0020Cases
-		SccLocalPath2 = MySqlTuner\u0020Test\u0020Cases
-		SccProjectUniqueName3 = MySQLTuner\\MySqlTuner\u0020.Net\u00202.0.csproj
-		SccProjectName3 = MySQLTuner
-		SccLocalPath3 = MySQLTuner
-	EndGlobalSection
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = MySQLTuner.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86

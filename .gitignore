@@ -6,8 +6,10 @@
 *.old
 *.suo
 *.user
+.vs
 /MySQLTuner/bin
 /MySQLTuner/obj
 /MySqlTuner Test Cases/bin
 /MySqlTuner Test Cases/obj
 /packages
+Thumbs.db

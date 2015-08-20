@@ -373,6 +373,7 @@ namespace MySqlTuner
         /// Loads this instance.
         /// </summary>
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "This is a complex routine")]
+        [SuppressMessage("Microsoft.Performance", "CA1809:AvoidExcessiveLocals", Justification = "This is a complex routine")]
         [SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "The value in the query comes from the MySQL System tables.")]
         public void Load()
         {
