@@ -16,7 +16,7 @@ namespace MySqlTuner
     public partial class FormMain : TuningCalculator
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="FormMain"/> class.
+        /// Initializes a new instance of the <see cref="FormMain"/> class.
         /// </summary>
         /// <param name="server">The server.</param>
         public FormMain(MySqlServer server)
@@ -26,7 +26,7 @@ namespace MySqlTuner
         }
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="FormMain"/> class.
+        /// Initializes a new instance of the <see cref="FormMain"/> class.
         /// </summary>
         public FormMain()
         {
@@ -43,9 +43,9 @@ namespace MySqlTuner
         /// <summary>
         /// The delegate for showing the progress bar as complete or incomplete
         /// </summary>
-        /// <param name="visible">if set to <c>true</c>, the progress bar is complete; otherwise <c>false</c>.</param>
+        /// <param name="visible">If set to <c>true</c>, the progress bar is complete; otherwise <c>false</c>.</param>
         private delegate void ProgressBarCompleteDelegate(bool visible);
-        
+
         /// <summary>
         /// Prints a message.
         /// </summary>

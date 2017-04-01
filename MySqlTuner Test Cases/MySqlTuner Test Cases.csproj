@@ -94,6 +94,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\App.manifest" />
+    <AdditionalFiles Include="..\MySQLTuner\stylecop.json">
+      <Link>stylecop.json</Link>
+    </AdditionalFiles>
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
@@ -102,7 +105,11 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Settings.StyleCop" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

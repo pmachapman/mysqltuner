@@ -15,7 +15,7 @@ namespace MySqlTuner
     public partial class FormLogOn : Form
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="FormLogOn"/> class.
+        /// Initializes a new instance of the <see cref="FormLogOn"/> class.
         /// </summary>
         public FormLogOn()
         {
@@ -65,11 +65,13 @@ namespace MySqlTuner
             }
 
             // Create a new server object
-            this.Server = new MySqlServer();
-            this.Server.Host = this.host.Text;
-            this.Server.Port = portNumber;
-            this.Server.UserName = this.userName.Text;
-            this.Server.Password = this.password.Text;
+            this.Server = new MySqlServer()
+            {
+                Host = this.host.Text,
+                Port = portNumber,
+                UserName = this.userName.Text,
+                Password = this.password.Text
+            };
             this.Server.Open();
 
             // Check for errors

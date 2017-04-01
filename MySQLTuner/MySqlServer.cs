@@ -23,7 +23,7 @@ namespace MySqlTuner
         private bool disposed = false;
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="MySqlServer"/> class.
+        /// Initializes a new instance of the <see cref="MySqlServer"/> class.
         /// </summary>
         /// <param name="userName">The username.</param>
         /// <param name="password">The password.</param>
@@ -37,7 +37,7 @@ namespace MySqlTuner
         }
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="MySqlServer"/> class.
+        /// Initializes a new instance of the <see cref="MySqlServer"/> class.
         /// </summary>
         /// <param name="userName">The username.</param>
         /// <param name="password">The password.</param>
@@ -49,7 +49,7 @@ namespace MySqlTuner
         }
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="MySqlServer"/> class.
+        /// Initializes a new instance of the <see cref="MySqlServer"/> class.
         /// </summary>
         /// <param name="userName">The username.</param>
         /// <param name="password">The password.</param>
@@ -60,7 +60,7 @@ namespace MySqlTuner
         }
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="MySqlServer"/> class.
+        /// Initializes a new instance of the <see cref="MySqlServer"/> class.
         /// </summary>
         /// <param name="userName">The username.</param>
         public MySqlServer(string userName)
@@ -70,7 +70,7 @@ namespace MySqlTuner
         }
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="MySqlServer"/> class.
+        /// Initializes a new instance of the <see cref="MySqlServer"/> class.
         /// </summary>
         public MySqlServer()
         {
@@ -92,7 +92,7 @@ namespace MySqlTuner
             this.Variables = new Dictionary<string, string>();
         }
 
-        /// <summary>Finalises an instance of the <see cref="MySqlServer"/> class.</summary>
+        /// <summary>Finalizes an instance of the <see cref="MySqlServer"/> class.</summary>
         /// <remarks>
         /// Releases unmanaged resources and performs other clean up operations before the
         /// <see cref="MySqlServer"/> is reclaimed by garbage collection.
@@ -325,15 +325,15 @@ namespace MySqlTuner
         public void Open()
         {
             // Create the connection string
-            MySqlConnectionStringBuilder connectionStringBuilder = new MySqlConnectionStringBuilder();
-            connectionStringBuilder.Server = this.Host;
-            connectionStringBuilder.Port = this.Port;
-            connectionStringBuilder.UserID = this.UserName;
-            connectionStringBuilder.Password = this.Password;
-
-            // Stop any time out issues
-            connectionStringBuilder.ConnectionTimeout = 30;
-            connectionStringBuilder.DefaultCommandTimeout = 0;
+            MySqlConnectionStringBuilder connectionStringBuilder = new MySqlConnectionStringBuilder()
+            {
+                Server = this.Host,
+                Port = this.Port,
+                UserID = this.UserName,
+                Password = this.Password,
+                ConnectionTimeout = 30, // Stop any time out issues
+                DefaultCommandTimeout = 0
+            };
 
             // Create the connection
             try
