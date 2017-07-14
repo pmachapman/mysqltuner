@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Peter Chapman")]
 [assembly: AssemblyProduct("MySQL Tuner Test Cases")]
-[assembly: AssemblyCopyright("Copyright © 2016 Peter Chapman")]
+[assembly: AssemblyCopyright("Copyright © 2017 Peter Chapman")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

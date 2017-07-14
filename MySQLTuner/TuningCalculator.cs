@@ -9,7 +9,6 @@ namespace MySqlTuner
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
     using System.Reflection;
     using System.Windows.Forms;
     using Microsoft.VisualBasic;
@@ -215,17 +214,17 @@ namespace MySqlTuner
             if (bytes >= Math.Pow(1024, 3))
             {
                 // GB
-                return (bytes / Math.Pow(1024, 3)).ToString("F1", CultureInfo.CurrentCulture) + "G";
+                return (bytes / Math.Pow(1024, 3)).ToString("F1", Settings.Culture) + "G";
             }
             else if (bytes >= Math.Pow(1024, 2))
             {
                 // MB
-                return (bytes / Math.Pow(1024, 2)).ToString("F1", CultureInfo.CurrentCulture) + "M";
+                return (bytes / Math.Pow(1024, 2)).ToString("F1", Settings.Culture) + "M";
             }
             else if (bytes >= 1024D)
             {
                 // KB
-                return (bytes / 1024D).ToString("F1", CultureInfo.CurrentCulture) + "K";
+                return (bytes / 1024D).ToString("F1", Settings.Culture) + "K";
             }
             else
             {
@@ -285,7 +284,7 @@ namespace MySqlTuner
             }
             else
             {
-                return number.ToString(CultureInfo.CurrentCulture);
+                return number.ToString(Settings.Culture);
             }
         }
 
@@ -313,7 +312,7 @@ namespace MySqlTuner
             }
             else
             {
-                return number.ToString("F3", CultureInfo.CurrentCulture);
+                return number.ToString("F3", Settings.Culture);
             }
         }
 
@@ -330,19 +329,19 @@ namespace MySqlTuner
             long days = uptime / 86400;
             if (days > 0)
             {
-                return string.Format(CultureInfo.CurrentCulture, "{0}d {1}h {2}m {3}s", days, hours, minutes, seconds);
+                return string.Format(Settings.Culture, "{0}d {1}h {2}m {3}s", days, hours, minutes, seconds);
             }
             else if (hours > 0)
             {
-                return string.Format(CultureInfo.CurrentCulture, "{0}h {1}m {2}s", hours, minutes, seconds);
+                return string.Format(Settings.Culture, "{0}h {1}m {2}s", hours, minutes, seconds);
             }
             else if (minutes > 0)
             {
-                return string.Format(CultureInfo.CurrentCulture, "{0}m {1}s", minutes, seconds);
+                return string.Format(Settings.Culture, "{0}m {1}s", minutes, seconds);
             }
             else
             {
-                return string.Format(CultureInfo.CurrentCulture, "{0}s", seconds);
+                return string.Format(Settings.Culture, "{0}s", seconds);
             }
         }
 
@@ -519,45 +518,45 @@ namespace MySqlTuner
             // Per-thread memory
             if (this.Server.Version.Major > 3)
             {
-                this.Calculations.Add("per_thread_buffers", Convert.ToInt64(this.Server.Variables["read_buffer_size"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Variables["read_rnd_buffer_size"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Variables["sort_buffer_size"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Variables["thread_stack"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Variables["join_buffer_size"], CultureInfo.CurrentCulture));
+                this.Calculations.Add("per_thread_buffers", Convert.ToInt64(this.Server.Variables["read_buffer_size"], Settings.Culture) + Convert.ToInt64(this.Server.Variables["read_rnd_buffer_size"], Settings.Culture) + Convert.ToInt64(this.Server.Variables["sort_buffer_size"], Settings.Culture) + Convert.ToInt64(this.Server.Variables["thread_stack"], Settings.Culture) + Convert.ToInt64(this.Server.Variables["join_buffer_size"], Settings.Culture));
             }
             else
             {
-                this.Calculations.Add("per_thread_buffers", Convert.ToInt64(this.Server.Variables["record_buffer"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Variables["record_rnd_buffer"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Variables["sort_buffer"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Variables["thread_stack"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Variables["join_buffer_size"], CultureInfo.CurrentCulture));
+                this.Calculations.Add("per_thread_buffers", Convert.ToInt64(this.Server.Variables["record_buffer"], Settings.Culture) + Convert.ToInt64(this.Server.Variables["record_rnd_buffer"], Settings.Culture) + Convert.ToInt64(this.Server.Variables["sort_buffer"], Settings.Culture) + Convert.ToInt64(this.Server.Variables["thread_stack"], Settings.Culture) + Convert.ToInt64(this.Server.Variables["join_buffer_size"], Settings.Culture));
             }
 
-            this.Calculations.Add("total_per_thread_buffers", Convert.ToInt64(this.Calculations["per_thread_buffers"], CultureInfo.CurrentCulture) * Convert.ToInt64(this.Server.Variables["max_connections"], CultureInfo.CurrentCulture));
-            this.Calculations.Add("max_total_per_thread_buffers", Convert.ToInt64(this.Calculations["per_thread_buffers"], CultureInfo.CurrentCulture) * Convert.ToInt64(this.Server.Status["Max_used_connections"], CultureInfo.CurrentCulture));
+            this.Calculations.Add("total_per_thread_buffers", Convert.ToInt64(this.Calculations["per_thread_buffers"], Settings.Culture) * Convert.ToInt64(this.Server.Variables["max_connections"], Settings.Culture));
+            this.Calculations.Add("max_total_per_thread_buffers", Convert.ToInt64(this.Calculations["per_thread_buffers"], Settings.Culture) * Convert.ToInt64(this.Server.Status["Max_used_connections"], Settings.Culture));
 
             // Server-wide memory
-            this.Calculations.Add("max_tmp_table_size", (Convert.ToInt64(this.Server.Variables["tmp_table_size"], CultureInfo.CurrentCulture) > Convert.ToInt64(this.Server.Variables["max_heap_table_size"], CultureInfo.CurrentCulture)) ? Convert.ToInt64(this.Server.Variables["max_heap_table_size"], CultureInfo.CurrentCulture) : Convert.ToInt64(this.Server.Variables["tmp_table_size"], CultureInfo.CurrentCulture));
-            this.Calculations.Add("server_buffers", Convert.ToInt64(this.Server.Variables["key_buffer_size"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Calculations["max_tmp_table_size"], CultureInfo.CurrentCulture));
-            this.Calculations["server_buffers"] += this.Server.Variables.ContainsKey("innodb_buffer_pool_size") ? Convert.ToInt64(this.Server.Variables["innodb_buffer_pool_size"], CultureInfo.CurrentCulture) : 0;
-            this.Calculations["server_buffers"] += this.Server.Variables.ContainsKey("innodb_additional_mem_pool_size") ? Convert.ToInt64(this.Server.Variables["innodb_additional_mem_pool_size"], CultureInfo.CurrentCulture) : 0;
-            this.Calculations["server_buffers"] += this.Server.Variables.ContainsKey("innodb_log_buffer_size") ? Convert.ToInt64(this.Server.Variables["innodb_log_buffer_size"], CultureInfo.CurrentCulture) : 0;
-            this.Calculations["server_buffers"] += this.Server.Variables.ContainsKey("query_cache_size") ? Convert.ToInt64(this.Server.Variables["query_cache_size"], CultureInfo.CurrentCulture) : 0;
+            this.Calculations.Add("max_tmp_table_size", (Convert.ToInt64(this.Server.Variables["tmp_table_size"], Settings.Culture) > Convert.ToInt64(this.Server.Variables["max_heap_table_size"], Settings.Culture)) ? Convert.ToInt64(this.Server.Variables["max_heap_table_size"], Settings.Culture) : Convert.ToInt64(this.Server.Variables["tmp_table_size"], Settings.Culture));
+            this.Calculations.Add("server_buffers", Convert.ToInt64(this.Server.Variables["key_buffer_size"], Settings.Culture) + Convert.ToInt64(this.Calculations["max_tmp_table_size"], Settings.Culture));
+            this.Calculations["server_buffers"] += this.Server.Variables.ContainsKey("innodb_buffer_pool_size") ? Convert.ToInt64(this.Server.Variables["innodb_buffer_pool_size"], Settings.Culture) : 0;
+            this.Calculations["server_buffers"] += this.Server.Variables.ContainsKey("innodb_additional_mem_pool_size") ? Convert.ToInt64(this.Server.Variables["innodb_additional_mem_pool_size"], Settings.Culture) : 0;
+            this.Calculations["server_buffers"] += this.Server.Variables.ContainsKey("innodb_log_buffer_size") ? Convert.ToInt64(this.Server.Variables["innodb_log_buffer_size"], Settings.Culture) : 0;
+            this.Calculations["server_buffers"] += this.Server.Variables.ContainsKey("query_cache_size") ? Convert.ToInt64(this.Server.Variables["query_cache_size"], Settings.Culture) : 0;
 
             // Global memory
             this.Calculations.Add("max_used_memory", this.Calculations["server_buffers"] + this.Calculations["max_total_per_thread_buffers"]);
             this.Calculations.Add("total_possible_used_memory", this.Calculations["server_buffers"] + this.Calculations["total_per_thread_buffers"]);
-            this.Calculations.Add("pct_physical_memory", Convert.ToInt64((Convert.ToUInt64(this.Calculations["total_possible_used_memory"], CultureInfo.CurrentCulture) * 100) / this.Server.PhysicalMemory, CultureInfo.CurrentCulture));
+            this.Calculations.Add("pct_physical_memory", Convert.ToInt64((Convert.ToUInt64(this.Calculations["total_possible_used_memory"], Settings.Culture) * 100) / this.Server.PhysicalMemory, Settings.Culture));
 
             // Slow queries
-            this.Calculations.Add("pct_slow_queries", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Slow_queries"], CultureInfo.CurrentCulture) / Convert.ToDouble(this.Server.Status["Questions"], CultureInfo.CurrentCulture)) * 100D));
+            this.Calculations.Add("pct_slow_queries", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Slow_queries"], Settings.Culture) / Convert.ToDouble(this.Server.Status["Questions"], Settings.Culture)) * 100D));
 
             // Connections
-            this.Calculations.Add("pct_connections_used", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Max_used_connections"], CultureInfo.CurrentCulture) / Convert.ToDouble(this.Server.Variables["max_connections"], CultureInfo.CurrentCulture)) * 100D));
+            this.Calculations.Add("pct_connections_used", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Max_used_connections"], Settings.Culture) / Convert.ToDouble(this.Server.Variables["max_connections"], Settings.Culture)) * 100D));
             this.Calculations["pct_connections_used"] = (this.Calculations["pct_connections_used"] > 100) ? 100 : this.Calculations["pct_connections_used"];
 
             // Key buffers
             if (this.Server.Version.Major > 3 && !(this.Server.Version.Major == 4 && this.Server.Version.Minor == 0))
             {
-                this.Calculations.Add("pct_key_buffer_used", (long)Math.Ceiling(1 - ((Convert.ToDouble(this.Server.Status["Key_blocks_unused"], CultureInfo.CurrentCulture) * Convert.ToDouble(this.Server.Variables["key_cache_block_size"], CultureInfo.CurrentCulture)) / Convert.ToDouble(this.Server.Variables["key_buffer_size"], CultureInfo.CurrentCulture))) * 100);
+                this.Calculations.Add("pct_key_buffer_used", (long)Math.Ceiling(1 - ((Convert.ToDouble(this.Server.Status["Key_blocks_unused"], Settings.Culture) * Convert.ToDouble(this.Server.Variables["key_cache_block_size"], Settings.Culture)) / Convert.ToDouble(this.Server.Variables["key_buffer_size"], Settings.Culture))) * 100);
             }
 
-            if (Convert.ToInt64(this.Server.Status["Key_read_requests"], CultureInfo.CurrentCulture) > 0)
+            if (Convert.ToInt64(this.Server.Status["Key_read_requests"], Settings.Culture) > 0)
             {
-                this.Calculations.Add("pct_keys_from_mem", 100 - (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Key_reads"], CultureInfo.CurrentCulture) / Convert.ToDouble(this.Server.Status["Key_read_requests"], CultureInfo.CurrentCulture)) * 100D));
+                this.Calculations.Add("pct_keys_from_mem", 100 - (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Key_reads"], Settings.Culture) / Convert.ToDouble(this.Server.Status["Key_read_requests"], Settings.Culture)) * 100D));
             }
             else
             {
@@ -570,10 +569,10 @@ namespace MySqlTuner
             // Query cache
             if (this.Server.Version.Major > 3)
             {
-                this.Calculations.Add("query_cache_efficiency", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Qcache_hits"], CultureInfo.CurrentCulture) / (Convert.ToDouble(this.Server.Status["Com_select"], CultureInfo.CurrentCulture) + Convert.ToDouble(this.Server.Status["Qcache_hits"], CultureInfo.CurrentCulture))) * 100D));
+                this.Calculations.Add("query_cache_efficiency", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Qcache_hits"], Settings.Culture) / (Convert.ToDouble(this.Server.Status["Com_select"], Settings.Culture) + Convert.ToDouble(this.Server.Status["Qcache_hits"], Settings.Culture))) * 100D));
                 if (this.Server.Variables["query_cache_size"] != "0")
                 {
-                    this.Calculations.Add("pct_query_cache_used", 100 - (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Qcache_free_memory"], CultureInfo.CurrentCulture) / Convert.ToDouble(this.Server.Variables["query_cache_size"], CultureInfo.CurrentCulture)) * 100));
+                    this.Calculations.Add("pct_query_cache_used", 100 - (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Qcache_free_memory"], Settings.Culture) / Convert.ToDouble(this.Server.Variables["query_cache_size"], Settings.Culture)) * 100));
                 }
 
                 if (this.Server.Status["Qcache_lowmem_prunes"] == "0")
@@ -582,22 +581,22 @@ namespace MySqlTuner
                 }
                 else
                 {
-                    this.Calculations.Add("query_cache_prunes_per_day", Convert.ToInt64(this.Server.Status["Qcache_lowmem_prunes"], CultureInfo.CurrentCulture) / (long)Math.Ceiling(Convert.ToInt64(this.Server.Status["Uptime"], CultureInfo.CurrentCulture) / 86400D));
+                    this.Calculations.Add("query_cache_prunes_per_day", Convert.ToInt64(this.Server.Status["Qcache_lowmem_prunes"], Settings.Culture) / (long)Math.Ceiling(Convert.ToInt64(this.Server.Status["Uptime"], Settings.Culture) / 86400D));
                 }
             }
 
             // Sorting
-            this.Calculations.Add("total_sorts", Convert.ToInt64(this.Server.Status["Sort_scan"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Status["Sort_range"], CultureInfo.CurrentCulture));
+            this.Calculations.Add("total_sorts", Convert.ToInt64(this.Server.Status["Sort_scan"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Sort_range"], Settings.Culture));
             if (this.Calculations["total_sorts"] > 0)
             {
-                this.Calculations.Add("pct_temp_sort_table", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Sort_merge_passes"], CultureInfo.CurrentCulture) / Convert.ToDouble(this.Calculations["total_sorts"], CultureInfo.CurrentCulture)) * 100D));
+                this.Calculations.Add("pct_temp_sort_table", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Sort_merge_passes"], Settings.Culture) / Convert.ToDouble(this.Calculations["total_sorts"], Settings.Culture)) * 100D));
             }
 
             // Joins
-            this.Calculations.Add("joins_without_indexes", Convert.ToInt64(this.Server.Status["Select_range_check"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Status["Select_full_join"], CultureInfo.CurrentCulture));
+            this.Calculations.Add("joins_without_indexes", Convert.ToInt64(this.Server.Status["Select_range_check"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Select_full_join"], Settings.Culture));
             if (this.Calculations["joins_without_indexes"] > 0)
             {
-                this.Calculations.Add("joins_without_indexes_per_day", this.Calculations["joins_without_indexes"] / (long)Math.Ceiling(Convert.ToInt64(this.Server.Status["Uptime"], CultureInfo.CurrentCulture) / 86400D));
+                this.Calculations.Add("joins_without_indexes_per_day", this.Calculations["joins_without_indexes"] / (long)Math.Ceiling(Convert.ToInt64(this.Server.Status["Uptime"], Settings.Culture) / 86400D));
             }
             else
             {
@@ -605,11 +604,11 @@ namespace MySqlTuner
             }
 
             // Temporary tables
-            if (Convert.ToInt64(this.Server.Status["Created_tmp_tables"], CultureInfo.CurrentCulture) > 0)
+            if (Convert.ToInt64(this.Server.Status["Created_tmp_tables"], Settings.Culture) > 0)
             {
-                if (Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], CultureInfo.CurrentCulture) > 0)
+                if (Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture) > 0)
                 {
-                    this.Calculations.Add("pct_temp_disk", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Created_tmp_disk_tables"], CultureInfo.CurrentCulture) / (Convert.ToDouble(this.Server.Status["Created_tmp_tables"], CultureInfo.CurrentCulture) + Convert.ToDouble(this.Server.Status["Created_tmp_disk_tables"], CultureInfo.CurrentCulture))) * 100D));
+                    this.Calculations.Add("pct_temp_disk", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture) / (Convert.ToDouble(this.Server.Status["Created_tmp_tables"], Settings.Culture) + Convert.ToDouble(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture))) * 100D));
                 }
                 else
                 {
@@ -618,9 +617,9 @@ namespace MySqlTuner
             }
 
             // Table cache
-            if (Convert.ToInt64(this.Server.Status["Opened_tables"], CultureInfo.CurrentCulture) > 0)
+            if (Convert.ToInt64(this.Server.Status["Opened_tables"], Settings.Culture) > 0)
             {
-                this.Calculations.Add("table_cache_hit_rate", Convert.ToInt64(this.Server.Status["Open_tables"], CultureInfo.CurrentCulture) * 100 / Convert.ToInt64(this.Server.Status["Opened_tables"], CultureInfo.CurrentCulture));
+                this.Calculations.Add("table_cache_hit_rate", Convert.ToInt64(this.Server.Status["Open_tables"], Settings.Culture) * 100 / Convert.ToInt64(this.Server.Status["Opened_tables"], Settings.Culture));
             }
             else
             {
@@ -628,13 +627,13 @@ namespace MySqlTuner
             }
 
             // Open files
-            if (Convert.ToInt64(this.Server.Variables["open_files_limit"], CultureInfo.CurrentCulture) > 0)
+            if (Convert.ToInt64(this.Server.Variables["open_files_limit"], Settings.Culture) > 0)
             {
-                this.Calculations.Add("pct_files_open", Convert.ToInt64(this.Server.Status["Open_files"], CultureInfo.CurrentCulture) * 100 / Convert.ToInt64(this.Server.Variables["open_files_limit"], CultureInfo.CurrentCulture));
+                this.Calculations.Add("pct_files_open", Convert.ToInt64(this.Server.Status["Open_files"], Settings.Culture) * 100 / Convert.ToInt64(this.Server.Variables["open_files_limit"], Settings.Culture));
             }
 
             // Table locks
-            if (Convert.ToInt64(this.Server.Status["Table_locks_immediate"], CultureInfo.CurrentCulture) > 0)
+            if (Convert.ToInt64(this.Server.Status["Table_locks_immediate"], Settings.Culture) > 0)
             {
                 if (this.Server.Status["Table_locks_waited"] == "0")
                 {
@@ -642,23 +641,23 @@ namespace MySqlTuner
                 }
                 else
                 {
-                    this.Calculations.Add("pct_table_locks_immediate", Convert.ToInt64(this.Server.Status["Table_locks_immediate"], CultureInfo.CurrentCulture) * 100 / (Convert.ToInt64(this.Server.Status["Table_locks_waited"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Status["Table_locks_immediate"], CultureInfo.CurrentCulture)));
+                    this.Calculations.Add("pct_table_locks_immediate", Convert.ToInt64(this.Server.Status["Table_locks_immediate"], Settings.Culture) * 100 / (Convert.ToInt64(this.Server.Status["Table_locks_waited"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Table_locks_immediate"], Settings.Culture)));
                 }
             }
 
             // Thread cache
-            this.Calculations.Add("thread_cache_hit_rate", 100 - (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Threads_created"], CultureInfo.CurrentCulture) / Convert.ToDouble(this.Server.Status["Connections"], CultureInfo.CurrentCulture)) * 100D));
+            this.Calculations.Add("thread_cache_hit_rate", 100 - (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Threads_created"], Settings.Culture) / Convert.ToDouble(this.Server.Status["Connections"], Settings.Culture)) * 100D));
 
             // Other
-            if (Convert.ToInt64(this.Server.Status["Connections"], CultureInfo.CurrentCulture) > 0)
+            if (Convert.ToInt64(this.Server.Status["Connections"], Settings.Culture) > 0)
             {
-                this.Calculations.Add("pct_aborted_connections", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Aborted_connects"], CultureInfo.CurrentCulture) / Convert.ToDouble(this.Server.Status["Connections"], CultureInfo.CurrentCulture)) * 100D));
+                this.Calculations.Add("pct_aborted_connections", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Aborted_connects"], Settings.Culture) / Convert.ToDouble(this.Server.Status["Connections"], Settings.Culture)) * 100D));
             }
 
-            if (Convert.ToInt64(this.Server.Status["Questions"], CultureInfo.CurrentCulture) > 0)
+            if (Convert.ToInt64(this.Server.Status["Questions"], Settings.Culture) > 0)
             {
-                this.Calculations.Add("total_reads", Convert.ToInt64(this.Server.Status["Com_select"], CultureInfo.CurrentCulture));
-                this.Calculations.Add("total_writes", Convert.ToInt64(this.Server.Status["Com_delete"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Status["Com_insert"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Status["Com_update"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Status["Com_replace"], CultureInfo.CurrentCulture));
+                this.Calculations.Add("total_reads", Convert.ToInt64(this.Server.Status["Com_select"], Settings.Culture));
+                this.Calculations.Add("total_writes", Convert.ToInt64(this.Server.Status["Com_delete"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Com_insert"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Com_update"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Com_replace"], Settings.Culture));
                 if (this.Calculations["total_reads"] == 0)
                 {
                     this.Calculations.Add("pct_reads", 0);
@@ -674,7 +673,7 @@ namespace MySqlTuner
             // InnoDB
             if (this.Server.Variables["have_innodb"] == "YES")
             {
-                this.Calculations.Add("innodb_log_size_pct", Convert.ToInt64(this.Server.Variables["innodb_log_file_size"], CultureInfo.CurrentCulture) * 100 / Convert.ToInt64(this.Server.Variables["innodb_buffer_pool_size"], CultureInfo.CurrentCulture));
+                this.Calculations.Add("innodb_log_size_pct", Convert.ToInt64(this.Server.Variables["innodb_log_file_size"], Settings.Culture) * 100 / Convert.ToInt64(this.Server.Variables["innodb_buffer_pool_size"], Settings.Culture));
             }
         }
 
@@ -688,21 +687,21 @@ namespace MySqlTuner
         {
             // Show uptime, queries per second, connections, traffic stats
             double qps;
-            if (Convert.ToInt64(this.Server.Status["Uptime"], CultureInfo.CurrentCulture) > 0)
+            if (Convert.ToInt64(this.Server.Status["Uptime"], Settings.Culture) > 0)
             {
-                qps = Convert.ToInt64(this.Server.Status["Questions"], CultureInfo.CurrentCulture) / Convert.ToInt64(this.Server.Status["Uptime"], CultureInfo.CurrentCulture);
+                qps = Convert.ToInt64(this.Server.Status["Questions"], Settings.Culture) / Convert.ToInt64(this.Server.Status["Uptime"], Settings.Culture);
             }
             else
             {
                 qps = 0;
             }
 
-            if (Convert.ToInt64(this.Server.Status["Uptime"], CultureInfo.CurrentCulture) < 86400)
+            if (Convert.ToInt64(this.Server.Status["Uptime"], Settings.Culture) < 86400)
             {
                 this.Recommendations.Add("MySQL started within last 24 hours - recommendations may be inaccurate");
             }
 
-            this.PrintMessage(Status.Info, "Up for: " + PrettyUptime(Convert.ToInt64(this.Server.Status["Uptime"], CultureInfo.CurrentCulture)) + " (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Questions"], CultureInfo.CurrentCulture)) + " q [" + DisplayRounded(qps) + " qps], " + DisplayRounded(Convert.ToInt64(this.Server.Status["Connections"], CultureInfo.CurrentCulture)) + " conn, TX: " + DisplayRounded(Convert.ToInt64(this.Server.Status["Bytes_sent"], CultureInfo.CurrentCulture)) + ", RX: " + DisplayRounded(Convert.ToInt64(this.Server.Status["Bytes_received"], CultureInfo.CurrentCulture)) + ")");
+            this.PrintMessage(Status.Info, "Up for: " + PrettyUptime(Convert.ToInt64(this.Server.Status["Uptime"], Settings.Culture)) + " (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Questions"], Settings.Culture)) + " q [" + DisplayRounded(qps) + " qps], " + DisplayRounded(Convert.ToInt64(this.Server.Status["Connections"], Settings.Culture)) + " conn, TX: " + DisplayRounded(Convert.ToInt64(this.Server.Status["Bytes_sent"], Settings.Culture)) + ", RX: " + DisplayRounded(Convert.ToInt64(this.Server.Status["Bytes_received"], Settings.Culture)) + ")");
             this.PrintMessage(Status.Info, "Reads / Writes: " + this.Calculations["pct_reads"] + "% / " + this.Calculations["pct_writes"] + "%");
 
             // Memory usage
@@ -725,14 +724,14 @@ namespace MySqlTuner
             // Slow queries
             if (this.Calculations["pct_slow_queries"] > 5)
             {
-                this.PrintMessage(Status.Fail, "Slow queries: " + this.Calculations["pct_slow_queries"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Slow_queries"], CultureInfo.CurrentCulture)) + "/" + DisplayRounded(Convert.ToInt64(this.Server.Status["Questions"], CultureInfo.CurrentCulture)) + ")");
+                this.PrintMessage(Status.Fail, "Slow queries: " + this.Calculations["pct_slow_queries"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Slow_queries"], Settings.Culture)) + "/" + DisplayRounded(Convert.ToInt64(this.Server.Status["Questions"], Settings.Culture)) + ")");
             }
             else
             {
-                this.PrintMessage(Status.Pass, "Slow queries: " + this.Calculations["pct_slow_queries"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Slow_queries"], CultureInfo.CurrentCulture)) + "/" + DisplayRounded(Convert.ToInt64(this.Server.Status["Questions"], CultureInfo.CurrentCulture)) + ")");
+                this.PrintMessage(Status.Pass, "Slow queries: " + this.Calculations["pct_slow_queries"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Slow_queries"], Settings.Culture)) + "/" + DisplayRounded(Convert.ToInt64(this.Server.Status["Questions"], Settings.Culture)) + ")");
             }
 
-            if (Convert.ToDouble(this.Server.Variables["long_query_time"], CultureInfo.CurrentCulture) > 10)
+            if (Convert.ToDouble(this.Server.Variables["long_query_time"], Settings.Culture) > 10)
             {
                 this.VariablesToAdjust.Add("long_query_time (<= 10)");
             }
@@ -774,25 +773,25 @@ namespace MySqlTuner
             }
             else
             {
-                if (Convert.ToInt64(this.Server.Variables["key_buffer_size"], CultureInfo.CurrentCulture) < this.Calculations["total_myisam_indexes"] && this.Calculations["pct_keys_from_mem"] < 95)
+                if (Convert.ToInt64(this.Server.Variables["key_buffer_size"], Settings.Culture) < this.Calculations["total_myisam_indexes"] && this.Calculations["pct_keys_from_mem"] < 95)
                 {
-                    this.PrintMessage(Status.Fail, "Key buffer size / total MyISAM indexes: " + DisplayBytes(Convert.ToInt64(this.Server.Variables["key_buffer_size"], CultureInfo.CurrentCulture)) + "/" + DisplayBytes(this.Calculations["total_myisam_indexes"]));
+                    this.PrintMessage(Status.Fail, "Key buffer size / total MyISAM indexes: " + DisplayBytes(Convert.ToInt64(this.Server.Variables["key_buffer_size"], Settings.Culture)) + "/" + DisplayBytes(this.Calculations["total_myisam_indexes"]));
                     this.VariablesToAdjust.Add("key_buffer_size (> " + DisplayBytes(this.Calculations["total_myisam_indexes"]) + ")");
                 }
                 else
                 {
-                    this.PrintMessage(Status.Pass, "Key buffer size / total MyISAM indexes: " + DisplayBytes(Convert.ToInt64(this.Server.Variables["key_buffer_size"], CultureInfo.CurrentCulture)) + "/" + DisplayBytes(this.Calculations["total_myisam_indexes"]));
+                    this.PrintMessage(Status.Pass, "Key buffer size / total MyISAM indexes: " + DisplayBytes(Convert.ToInt64(this.Server.Variables["key_buffer_size"], Settings.Culture)) + "/" + DisplayBytes(this.Calculations["total_myisam_indexes"]));
                 }
 
-                if (Convert.ToInt64(this.Server.Status["Key_read_requests"], CultureInfo.CurrentCulture) > 0)
+                if (Convert.ToInt64(this.Server.Status["Key_read_requests"], Settings.Culture) > 0)
                 {
                     if (this.Calculations["pct_keys_from_mem"] < 95)
                     {
-                        this.PrintMessage(Status.Fail, "Key buffer hit rate: " + this.Calculations["pct_keys_from_mem"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Key_read_requests"], CultureInfo.CurrentCulture)) + " cached / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Key_reads"], CultureInfo.CurrentCulture)) + " reads)");
+                        this.PrintMessage(Status.Fail, "Key buffer hit rate: " + this.Calculations["pct_keys_from_mem"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Key_read_requests"], Settings.Culture)) + " cached / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Key_reads"], Settings.Culture)) + " reads)");
                     }
                     else
                     {
-                        this.PrintMessage(Status.Pass, "Key buffer hit rate: " + this.Calculations["pct_keys_from_mem"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Key_read_requests"], CultureInfo.CurrentCulture)) + " cached / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Key_reads"], CultureInfo.CurrentCulture)) + " reads)");
+                        this.PrintMessage(Status.Pass, "Key buffer hit rate: " + this.Calculations["pct_keys_from_mem"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Key_read_requests"], Settings.Culture)) + " cached / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Key_reads"], Settings.Culture)) + " reads)");
                     }
                 }
                 else
@@ -807,12 +806,12 @@ namespace MySqlTuner
                 // MySQL versions < 4.01 don't support query caching
                 this.Recommendations.Add("Upgrade MySQL to version 4+ to utilize query caching");
             }
-            else if (Convert.ToInt64(this.Server.Variables["query_cache_size"], CultureInfo.CurrentCulture) < 1)
+            else if (Convert.ToInt64(this.Server.Variables["query_cache_size"], Settings.Culture) < 1)
             {
                 this.PrintMessage(Status.Fail, "Query cache is disabled");
                 this.VariablesToAdjust.Add("query_cache_size (>= 8M)");
             }
-            else if (Convert.ToInt64(this.Server.Status["Com_select"], CultureInfo.CurrentCulture) == 0)
+            else if (Convert.ToInt64(this.Server.Status["Com_select"], Settings.Culture) == 0)
             {
                 this.PrintMessage(Status.Fail, "Query cache cannot be analyzed - no SELECT statements executed");
             }
@@ -820,25 +819,25 @@ namespace MySqlTuner
             {
                 if (this.Calculations["query_cache_efficiency"] < 20)
                 {
-                    this.PrintMessage(Status.Fail, "Query cache efficiency: " + this.Calculations["query_cache_efficiency"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Qcache_hits"], CultureInfo.CurrentCulture)) + " cached / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Qcache_hits"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Status["Com_select"], CultureInfo.CurrentCulture)) + " selects)");
-                    this.VariablesToAdjust.Add("query_cache_limit (> " + DisplayBytesRounded(Convert.ToInt64(this.Server.Variables["query_cache_limit"], CultureInfo.CurrentCulture)) + ", or use smaller result sets)");
+                    this.PrintMessage(Status.Fail, "Query cache efficiency: " + this.Calculations["query_cache_efficiency"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Qcache_hits"], Settings.Culture)) + " cached / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Qcache_hits"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Com_select"], Settings.Culture)) + " selects)");
+                    this.VariablesToAdjust.Add("query_cache_limit (> " + DisplayBytesRounded(Convert.ToInt64(this.Server.Variables["query_cache_limit"], Settings.Culture)) + ", or use smaller result sets)");
                 }
                 else
                 {
-                    this.PrintMessage(Status.Pass, "Query cache efficiency: " + this.Calculations["query_cache_efficiency"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Qcache_hits"], CultureInfo.CurrentCulture)) + " cached / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Qcache_hits"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Status["Com_select"], CultureInfo.CurrentCulture)) + " selects)");
+                    this.PrintMessage(Status.Pass, "Query cache efficiency: " + this.Calculations["query_cache_efficiency"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Qcache_hits"], Settings.Culture)) + " cached / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Qcache_hits"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Com_select"], Settings.Culture)) + " selects)");
                 }
 
                 if (this.Calculations["query_cache_prunes_per_day"] > 98)
                 {
                     this.PrintMessage(Status.Fail, "Query cache prunes per day: " + this.Calculations["query_cache_prunes_per_day"]);
-                    if (Convert.ToInt64(this.Server.Variables["query_cache_size"], CultureInfo.CurrentCulture) > 128 * 1024 * 1024)
+                    if (Convert.ToInt64(this.Server.Variables["query_cache_size"], Settings.Culture) > 128 * 1024 * 1024)
                     {
                         this.Recommendations.Add("Increasing the query_cache size over 128M may reduce performance");
-                        this.VariablesToAdjust.Add("query_cache_size (> " + DisplayBytesRounded(Convert.ToInt64(this.Server.Variables["query_cache_size"], CultureInfo.CurrentCulture)) + ") [see warning above]");
+                        this.VariablesToAdjust.Add("query_cache_size (> " + DisplayBytesRounded(Convert.ToInt64(this.Server.Variables["query_cache_size"], Settings.Culture)) + ") [see warning above]");
                     }
                     else
                     {
-                        this.VariablesToAdjust.Add("query_cache_size (> " + DisplayBytesRounded(Convert.ToInt64(this.Server.Variables["query_cache_size"], CultureInfo.CurrentCulture)) + ")");
+                        this.VariablesToAdjust.Add("query_cache_size (> " + DisplayBytesRounded(Convert.ToInt64(this.Server.Variables["query_cache_size"], Settings.Culture)) + ")");
                     }
                 }
                 else
@@ -855,20 +854,20 @@ namespace MySqlTuner
             }
             else if (this.Calculations["pct_temp_sort_table"] > 10)
             {
-                this.PrintMessage(Status.Fail, "Sorts requiring temporary tables: " + this.Calculations["pct_temp_sort_table"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Sort_merge_passes"], CultureInfo.CurrentCulture)) + " temp sorts / " + DisplayRounded(this.Calculations["total_sorts"]) + " sorts)");
-                this.VariablesToAdjust.Add("sort_buffer_size (> " + DisplayBytesRounded(Convert.ToInt64(this.Server.Variables["sort_buffer_size"], CultureInfo.CurrentCulture)) + ")");
-                this.VariablesToAdjust.Add("read_rnd_buffer_size (> " + DisplayBytesRounded(Convert.ToInt64(this.Server.Variables["read_rnd_buffer_size"], CultureInfo.CurrentCulture)) + ")");
+                this.PrintMessage(Status.Fail, "Sorts requiring temporary tables: " + this.Calculations["pct_temp_sort_table"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Sort_merge_passes"], Settings.Culture)) + " temp sorts / " + DisplayRounded(this.Calculations["total_sorts"]) + " sorts)");
+                this.VariablesToAdjust.Add("sort_buffer_size (> " + DisplayBytesRounded(Convert.ToInt64(this.Server.Variables["sort_buffer_size"], Settings.Culture)) + ")");
+                this.VariablesToAdjust.Add("read_rnd_buffer_size (> " + DisplayBytesRounded(Convert.ToInt64(this.Server.Variables["read_rnd_buffer_size"], Settings.Culture)) + ")");
             }
             else
             {
-                this.PrintMessage(Status.Pass, "Sorts requiring temporary tables: " + this.Calculations["pct_temp_sort_table"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Sort_merge_passes"], CultureInfo.CurrentCulture)) + " temp sorts / " + DisplayRounded(this.Calculations["total_sorts"]) + " sorts)");
+                this.PrintMessage(Status.Pass, "Sorts requiring temporary tables: " + this.Calculations["pct_temp_sort_table"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Sort_merge_passes"], Settings.Culture)) + " temp sorts / " + DisplayRounded(this.Calculations["total_sorts"]) + " sorts)");
             }
 
             // Joins
             if (this.Calculations["joins_without_indexes_per_day"] > 250)
             {
                 this.PrintMessage(Status.Fail, "Joins performed without indexes: " + this.Calculations["joins_without_indexes"]);
-                this.VariablesToAdjust.Add("join_buffer_size (> " + DisplayBytes(Convert.ToInt64(this.Server.Variables["join_buffer_size"], CultureInfo.CurrentCulture)) + ", or always use indexes with joins)");
+                this.VariablesToAdjust.Add("join_buffer_size (> " + DisplayBytes(Convert.ToInt64(this.Server.Variables["join_buffer_size"], Settings.Culture)) + ", or always use indexes with joins)");
                 this.Recommendations.Add("Adjust your join queries to always utilize indexes");
             }
             else
@@ -878,25 +877,25 @@ namespace MySqlTuner
             }
 
             // Temporary tables
-            if (Convert.ToInt64(this.Server.Status["Created_tmp_tables"], CultureInfo.CurrentCulture) > 0)
+            if (Convert.ToInt64(this.Server.Status["Created_tmp_tables"], Settings.Culture) > 0)
             {
                 if (this.Calculations["pct_temp_disk"] > 25 && this.Calculations["max_tmp_table_size"] < 256 * 1024 * 1024)
                 {
-                    this.PrintMessage(Status.Fail, "Temporary tables created on disk: " + this.Calculations["pct_temp_disk"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], CultureInfo.CurrentCulture)) + " on disk / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Status["Created_tmp_tables"], CultureInfo.CurrentCulture)) + " total)");
-                    this.VariablesToAdjust.Add("tmp_table_size (> " + DisplayBytesRounded(Convert.ToInt64(this.Server.Variables["tmp_table_size"], CultureInfo.CurrentCulture)) + ")");
-                    this.VariablesToAdjust.Add("max_heap_table_size (> " + DisplayBytesRounded(Convert.ToInt64(this.Server.Variables["max_heap_table_size"], CultureInfo.CurrentCulture)) + ")");
+                    this.PrintMessage(Status.Fail, "Temporary tables created on disk: " + this.Calculations["pct_temp_disk"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture)) + " on disk / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Created_tmp_tables"], Settings.Culture)) + " total)");
+                    this.VariablesToAdjust.Add("tmp_table_size (> " + DisplayBytesRounded(Convert.ToInt64(this.Server.Variables["tmp_table_size"], Settings.Culture)) + ")");
+                    this.VariablesToAdjust.Add("max_heap_table_size (> " + DisplayBytesRounded(Convert.ToInt64(this.Server.Variables["max_heap_table_size"], Settings.Culture)) + ")");
                     this.Recommendations.Add("When making adjustments, make tmp_table_size/max_heap_table_size equal");
                     this.Recommendations.Add("Reduce your SELECT DISTINCT queries without LIMIT clauses");
                 }
                 else if (this.Calculations["pct_temp_disk"] > 25 && this.Calculations["max_tmp_table_size"] >= 256)
                 {
-                    this.PrintMessage(Status.Fail, "Temporary tables created on disk: " + this.Calculations["pct_temp_disk"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], CultureInfo.CurrentCulture)) + " on disk / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Status["Created_tmp_tables"], CultureInfo.CurrentCulture)) + " total)");
+                    this.PrintMessage(Status.Fail, "Temporary tables created on disk: " + this.Calculations["pct_temp_disk"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture)) + " on disk / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Created_tmp_tables"], Settings.Culture)) + " total)");
                     this.Recommendations.Add("Temporary table size is already large - reduce result set size");
                     this.Recommendations.Add("Reduce your SELECT DISTINCT queries without LIMIT clauses");
                 }
                 else
                 {
-                    this.PrintMessage(Status.Pass, "Temporary tables created on disk: " + this.Calculations["pct_temp_disk"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], CultureInfo.CurrentCulture)) + " on disk / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Status["Created_tmp_tables"], CultureInfo.CurrentCulture)) + " total)");
+                    this.PrintMessage(Status.Pass, "Temporary tables created on disk: " + this.Calculations["pct_temp_disk"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture)) + " on disk / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Created_tmp_disk_tables"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Created_tmp_tables"], Settings.Culture)) + " total)");
                 }
             }
             else
@@ -906,7 +905,7 @@ namespace MySqlTuner
             }
 
             // Thread cache
-            if (Convert.ToInt64(this.Server.Variables["thread_cache_size"], CultureInfo.CurrentCulture) == 0)
+            if (Convert.ToInt64(this.Server.Variables["thread_cache_size"], Settings.Culture) == 0)
             {
                 this.PrintMessage(Status.Fail, "Thread cache is disabled");
                 this.Recommendations.Add("Set thread_cache_size to 4 as a starting value");
@@ -916,21 +915,21 @@ namespace MySqlTuner
             {
                 if (this.Calculations["thread_cache_hit_rate"] <= 50)
                 {
-                    this.PrintMessage(Status.Fail, "Thread cache hit rate: " + this.Calculations["thread_cache_hit_rate"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Threads_created"], CultureInfo.CurrentCulture)) + " created / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Connections"], CultureInfo.CurrentCulture)) + " connections)");
+                    this.PrintMessage(Status.Fail, "Thread cache hit rate: " + this.Calculations["thread_cache_hit_rate"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Threads_created"], Settings.Culture)) + " created / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Connections"], Settings.Culture)) + " connections)");
                     this.VariablesToAdjust.Add("thread_cache_size (> " + this.Server.Variables["thread_cache_size"] + ")");
                 }
                 else
                 {
-                    this.PrintMessage(Status.Pass, "Thread cache hit rate: " + this.Calculations["thread_cache_hit_rate"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Threads_created"], CultureInfo.CurrentCulture)) + " created / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Connections"], CultureInfo.CurrentCulture)) + " connections)");
+                    this.PrintMessage(Status.Pass, "Thread cache hit rate: " + this.Calculations["thread_cache_hit_rate"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Threads_created"], Settings.Culture)) + " created / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Connections"], Settings.Culture)) + " connections)");
                 }
             }
 
             // Table cache
-            if (Convert.ToInt64(this.Server.Status["Open_tables"], CultureInfo.CurrentCulture) > 0)
+            if (Convert.ToInt64(this.Server.Status["Open_tables"], Settings.Culture) > 0)
             {
                 if (this.Calculations["table_cache_hit_rate"] < 20)
                 {
-                    this.PrintMessage(Status.Fail, "Table cache hit rate: " + this.Calculations["table_cache_hit_rate"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Open_tables"], CultureInfo.CurrentCulture)) + " open / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Opened_tables"], CultureInfo.CurrentCulture)) + " opened)");
+                    this.PrintMessage(Status.Fail, "Table cache hit rate: " + this.Calculations["table_cache_hit_rate"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Open_tables"], Settings.Culture)) + " open / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Opened_tables"], Settings.Culture)) + " opened)");
                     if (this.Server.Version.Major > 5 || (this.Server.Version.Major == 5 && this.Server.Version.Minor >= 1))
                     {
                         this.VariablesToAdjust.Add("table_open_cache (> " + this.Server.Variables["table_open_cache"] + ")");
@@ -944,7 +943,7 @@ namespace MySqlTuner
                 }
                 else
                 {
-                    this.PrintMessage(Status.Pass, "Table cache hit rate: " + this.Calculations["table_cache_hit_rate"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Open_tables"], CultureInfo.CurrentCulture)) + " open / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Opened_tables"], CultureInfo.CurrentCulture)) + " opened)");
+                    this.PrintMessage(Status.Pass, "Table cache hit rate: " + this.Calculations["table_cache_hit_rate"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Open_tables"], Settings.Culture)) + " open / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Opened_tables"], Settings.Culture)) + " opened)");
                 }
             }
 
@@ -953,12 +952,12 @@ namespace MySqlTuner
             {
                 if (this.Calculations["pct_files_open"] > 85)
                 {
-                    this.PrintMessage(Status.Fail, "Open file limit used: " + this.Calculations["pct_files_open"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Open_files"], CultureInfo.CurrentCulture)) + "/" + DisplayRounded(Convert.ToInt64(this.Server.Variables["open_files_limit"], CultureInfo.CurrentCulture)) + ")");
+                    this.PrintMessage(Status.Fail, "Open file limit used: " + this.Calculations["pct_files_open"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Open_files"], Settings.Culture)) + "/" + DisplayRounded(Convert.ToInt64(this.Server.Variables["open_files_limit"], Settings.Culture)) + ")");
                     this.VariablesToAdjust.Add("open_files_limit (> " + this.Server.Variables["open_files_limit"] + ")");
                 }
                 else
                 {
-                    this.PrintMessage(Status.Pass, "Open file limit used: " + this.Calculations["pct_files_open"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Open_files"], CultureInfo.CurrentCulture)) + "/" + DisplayRounded(Convert.ToInt64(this.Server.Variables["open_files_limit"], CultureInfo.CurrentCulture)) + ")");
+                    this.PrintMessage(Status.Pass, "Open file limit used: " + this.Calculations["pct_files_open"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Open_files"], Settings.Culture)) + "/" + DisplayRounded(Convert.ToInt64(this.Server.Variables["open_files_limit"], Settings.Culture)) + ")");
                 }
             }
 
@@ -972,7 +971,7 @@ namespace MySqlTuner
                 }
                 else
                 {
-                    this.PrintMessage(Status.Pass, "Table locks acquired immediately: " + this.Calculations["pct_table_locks_immediate"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Table_locks_immediate"], CultureInfo.CurrentCulture)) + " immediate / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Table_locks_waited"], CultureInfo.CurrentCulture) + Convert.ToInt64(this.Server.Status["Table_locks_immediate"], CultureInfo.CurrentCulture)) + " locks)");
+                    this.PrintMessage(Status.Pass, "Table locks acquired immediately: " + this.Calculations["pct_table_locks_immediate"] + "% (" + DisplayRounded(Convert.ToInt64(this.Server.Status["Table_locks_immediate"], Settings.Culture)) + " immediate / " + DisplayRounded(Convert.ToInt64(this.Server.Status["Table_locks_waited"], Settings.Culture) + Convert.ToInt64(this.Server.Status["Table_locks_immediate"], Settings.Culture)) + " locks)");
                 }
             }
 
@@ -989,7 +988,7 @@ namespace MySqlTuner
             {
                 this.Recommendations.Add("Enable concurrent_insert by setting it to 'ON'");
             }
-            else if (this.Server.Variables["concurrent_insert"] != "ON" && this.Server.Variables["concurrent_insert"] != "AUTO" && this.Server.Variables["concurrent_insert"] != "ALWAYS" && Convert.ToInt64(this.Server.Variables["concurrent_insert"], CultureInfo.CurrentCulture) == 0)
+            else if (this.Server.Variables["concurrent_insert"] != "ON" && this.Server.Variables["concurrent_insert"] != "AUTO" && this.Server.Variables["concurrent_insert"] != "ALWAYS" && Convert.ToInt64(this.Server.Variables["concurrent_insert"], Settings.Culture) == 0)
             {
                 this.Recommendations.Add("Enable concurrent_insert by setting it to 1");
             }
@@ -1003,13 +1002,13 @@ namespace MySqlTuner
             // InnoDB
             if (this.Server.Variables.ContainsKey("have_innodb") && this.Server.Variables["have_innodb"] == "YES" && this.Server.EngineStatistics.ContainsKey("InnoDB"))
             {
-                if (Convert.ToInt64(this.Server.Variables["innodb_buffer_pool_size"], CultureInfo.CurrentCulture) > this.Server.EngineStatistics["InnoDB"])
+                if (Convert.ToInt64(this.Server.Variables["innodb_buffer_pool_size"], Settings.Culture) > this.Server.EngineStatistics["InnoDB"])
                 {
-                    this.PrintMessage(Status.Pass, "InnoDB data size / buffer pool: " + DisplayBytes(this.Server.EngineStatistics["InnoDB"]) + "/" + DisplayBytes(Convert.ToInt64(this.Server.Variables["innodb_buffer_pool_size"], CultureInfo.CurrentCulture)));
+                    this.PrintMessage(Status.Pass, "InnoDB data size / buffer pool: " + DisplayBytes(this.Server.EngineStatistics["InnoDB"]) + "/" + DisplayBytes(Convert.ToInt64(this.Server.Variables["innodb_buffer_pool_size"], Settings.Culture)));
                 }
                 else
                 {
-                    this.PrintMessage(Status.Fail, "InnoDB data size / buffer pool: " + DisplayBytes(this.Server.EngineStatistics["InnoDB"]) + "/" + DisplayBytes(Convert.ToInt64(this.Server.Variables["innodb_buffer_pool_size"], CultureInfo.CurrentCulture)));
+                    this.PrintMessage(Status.Fail, "InnoDB data size / buffer pool: " + DisplayBytes(this.Server.EngineStatistics["InnoDB"]) + "/" + DisplayBytes(Convert.ToInt64(this.Server.Variables["innodb_buffer_pool_size"], Settings.Culture)));
                     this.VariablesToAdjust.Add("innodb_buffer_pool_size (>= " + DisplayBytesRounded(this.Server.EngineStatistics["InnoDB"]) + ")");
                 }
             }
