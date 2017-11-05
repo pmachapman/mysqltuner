@@ -490,7 +490,7 @@ namespace MySqlTuner
                     {
                         while (reader.Read())
                         {
-                            this.PrintMessage(Status.Fail, "User '" + reader[0].ToString() + "' has no password set.");
+                            this.PrintMessage(Status.Fail, "User '" + reader.GetString(0) + "' has no password set.");
                         }
                     }
                     else

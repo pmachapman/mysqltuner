@@ -392,14 +392,14 @@ namespace MySqlTuner
                 {
                     while (reader.Read())
                     {
-                        string key = reader[0].ToString();
+                        string key = reader.GetString(0);
                         if (this.Variables.ContainsKey(key))
                         {
-                            this.Variables[key] = reader[1].ToString();
+                            this.Variables[key] = reader.GetString(1);
                         }
                         else
                         {
-                            this.Variables.Add(key, reader[1].ToString());
+                            this.Variables.Add(key, reader.GetString(1));
                         }
                     }
                 }
@@ -413,14 +413,14 @@ namespace MySqlTuner
                 {
                     while (reader.Read())
                     {
-                        string key = reader[0].ToString();
+                        string key = reader.GetString(0);
                         if (this.Status.ContainsKey(key))
                         {
-                            this.Status[key] = reader[1].ToString();
+                            this.Status[key] = reader.GetString(1);
                         }
                         else
                         {
-                            this.Status.Add(key, reader[1].ToString());
+                            this.Status.Add(key, reader.GetString(1));
                         }
                     }
                 }
@@ -449,7 +449,7 @@ namespace MySqlTuner
                 {
                     while (reader.Read())
                     {
-                        string engine = reader[0].ToString().ToLower(Settings.Culture);
+                        string engine = reader.GetString(0).ToLower(Settings.Culture);
                         if (engine == "federated" || engine == "blackhole")
                         {
                             engine += "_engine";
@@ -459,7 +459,7 @@ namespace MySqlTuner
                             engine = "bdb";
                         }
 
-                        string value = reader[1].ToString();
+                        string value = reader.GetString(1);
                         if (value == "DEFAULT")
                         {
                             value = "YES";
@@ -489,15 +489,15 @@ namespace MySqlTuner
                     {
                         while (reader.Read())
                         {
-                            string key = reader[0].ToString();
+                            string key = reader.GetString(0);
                             long size;
-                            if (!long.TryParse(reader[1].ToString(), out size))
+                            if (!long.TryParse(reader.GetString(1), out size))
                             {
                                 size = 0;
                             }
 
                             long count;
-                            if (!long.TryParse(reader[2].ToString(), out count))
+                            if (!long.TryParse(reader.GetString(2), out count))
                             {
                                 count = 0;
                             }
@@ -557,7 +557,7 @@ namespace MySqlTuner
                     {
                         while (reader.Read())
                         {
-                            databases.Add(reader[0].ToString());
+                            databases.Add(reader.GetString(0));
                         }
                     }
                 }
@@ -579,18 +579,18 @@ namespace MySqlTuner
                             {
                                 while (reader.Read())
                                 {
-                                    string key = reader[1].ToString();
+                                    string key = reader.GetString(1);
                                     long size;
                                     long dataFree;
                                     if (this.Version.Major == 3 || (this.Version.Major == 4 && this.Version.Minor == 0))
                                     {
                                         // MySQL 3.23/4.0 keeps Data_Length in the 6th column
-                                        if (!long.TryParse(reader[5].ToString(), out size))
+                                        if (!long.TryParse(reader.GetString(5), out size))
                                         {
                                             size = 0;
                                         }
 
-                                        if (!long.TryParse(reader[8].ToString(), out dataFree))
+                                        if (!long.TryParse(reader.GetString(8), out dataFree))
                                         {
                                             dataFree = 0;
                                         }
@@ -598,12 +598,12 @@ namespace MySqlTuner
                                     else
                                     {
                                         // MySQL 4.1+ keeps Data_Length in the 7th column
-                                        if (!long.TryParse(reader[6].ToString(), out size))
+                                        if (!long.TryParse(reader.GetString(6), out size))
                                         {
                                             size = 0;
                                         }
 
-                                        if (!long.TryParse(reader[9].ToString(), out dataFree))
+                                        if (!long.TryParse(reader.GetString(9), out dataFree))
                                         {
                                             dataFree = 0;
                                         }

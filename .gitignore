@@ -7,11 +7,7 @@
 *.suo
 *.user
 .vs
-/MySQLTuner/bin
-/MySQLTuner/obj
-/MySQLTuner .Net 2.0/bin
-/MySQLTuner .Net 2.0/obj
-/MySqlTuner Test Cases/bin
-/MySqlTuner Test Cases/obj
-/packages
+bin
+obj
+packages
 Thumbs.db

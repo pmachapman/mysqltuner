@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.12
+VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlTuner", "MySQLTuner\MySqlTuner.csproj", "{35C43F05-DA65-4420-98C2-3A53D29235BD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlTuner .Net 2.0", "MySQLTuner .Net 2.0\MySqlTuner .Net 2.0.csproj", "{5AEEF329-5BA7-43E7-8A93-22BF84120A73}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlTuner Test Cases", "MySqlTuner Test Cases\MySqlTuner Test Cases.csproj", "{4E0E1065-B769-4177-9BA7-C9E9F232501D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlTuner .Net 2.0 MySQL 4.1", "MySQLTuner .Net 2.0 MySQL 4.1\MySqlTuner .Net 2.0 MySQL 4.1.csproj", "{B2424B97-C0AE-4D0B-8350-161E46C58504}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,16 +21,23 @@ Global
 		{35C43F05-DA65-4420-98C2-3A53D29235BD}.Debug|x86.Build.0 = Debug|x86
 		{35C43F05-DA65-4420-98C2-3A53D29235BD}.Release|x86.ActiveCfg = Release|x86
 		{35C43F05-DA65-4420-98C2-3A53D29235BD}.Release|x86.Build.0 = Release|x86
-		{4E0E1065-B769-4177-9BA7-C9E9F232501D}.Debug|x86.ActiveCfg = Debug|x86
-		{4E0E1065-B769-4177-9BA7-C9E9F232501D}.Debug|x86.Build.0 = Debug|x86
-		{4E0E1065-B769-4177-9BA7-C9E9F232501D}.Release|x86.ActiveCfg = Release|x86
-		{4E0E1065-B769-4177-9BA7-C9E9F232501D}.Release|x86.Build.0 = Release|x86
 		{5AEEF329-5BA7-43E7-8A93-22BF84120A73}.Debug|x86.ActiveCfg = Debug|x86
 		{5AEEF329-5BA7-43E7-8A93-22BF84120A73}.Debug|x86.Build.0 = Debug|x86
 		{5AEEF329-5BA7-43E7-8A93-22BF84120A73}.Release|x86.ActiveCfg = Release|x86
 		{5AEEF329-5BA7-43E7-8A93-22BF84120A73}.Release|x86.Build.0 = Release|x86
+		{4E0E1065-B769-4177-9BA7-C9E9F232501D}.Debug|x86.ActiveCfg = Debug|x86
+		{4E0E1065-B769-4177-9BA7-C9E9F232501D}.Debug|x86.Build.0 = Debug|x86
+		{4E0E1065-B769-4177-9BA7-C9E9F232501D}.Release|x86.ActiveCfg = Release|x86
+		{4E0E1065-B769-4177-9BA7-C9E9F232501D}.Release|x86.Build.0 = Release|x86
+		{B2424B97-C0AE-4D0B-8350-161E46C58504}.Debug|x86.ActiveCfg = Debug|x86
+		{B2424B97-C0AE-4D0B-8350-161E46C58504}.Debug|x86.Build.0 = Debug|x86
+		{B2424B97-C0AE-4D0B-8350-161E46C58504}.Release|x86.ActiveCfg = Release|x86
+		{B2424B97-C0AE-4D0B-8350-161E46C58504}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {333CC5DD-C6B1-4645-A586-4A028173233D}
 	EndGlobalSection
 EndGlobal
