@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlTuner Test Cases", "My
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlTuner .Net 2.0 MySQL 4.1", "MySQLTuner .Net 2.0 MySQL 4.1\MySqlTuner .Net 2.0 MySQL 4.1.csproj", "{B2424B97-C0AE-4D0B-8350-161E46C58504}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlTuner .Net 2.0 MySQL 4.0", "MySQLTuner .Net 2.0 MySQL 4.0\MySqlTuner .Net 2.0 MySQL 4.0.csproj", "{AE15255B-A814-4295-99E2-E8B0C488BA8E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -33,6 +35,10 @@ Global
 		{B2424B97-C0AE-4D0B-8350-161E46C58504}.Debug|x86.Build.0 = Debug|x86
 		{B2424B97-C0AE-4D0B-8350-161E46C58504}.Release|x86.ActiveCfg = Release|x86
 		{B2424B97-C0AE-4D0B-8350-161E46C58504}.Release|x86.Build.0 = Release|x86
+		{AE15255B-A814-4295-99E2-E8B0C488BA8E}.Debug|x86.ActiveCfg = Debug|x86
+		{AE15255B-A814-4295-99E2-E8B0C488BA8E}.Debug|x86.Build.0 = Debug|x86
+		{AE15255B-A814-4295-99E2-E8B0C488BA8E}.Release|x86.ActiveCfg = Release|x86
+		{AE15255B-A814-4295-99E2-E8B0C488BA8E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -439,40 +439,44 @@ namespace MySqlTuner
                 }
             }
 
-            // have_* for engines is deprecated and will be removed in MySQL 5.6;
-            // check SHOW ENGINES and set corresponding old style variables.
-            // Also works around MySQL bug #59393 wrt. skip-innodb
-            sql = "SHOW ENGINES";
-            using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
+            // This only works in MySQL 4.1.2 or higher
+            if (this.Version.Major > 4 || (this.Version.Major == 4 && this.Version.Minor >= 1))
             {
-                using (MySqlDataReader reader = command.ExecuteReader())
+                // have_* for engines is deprecated and will be removed in MySQL 5.6;
+                // check SHOW ENGINES and set corresponding old style variables.
+                // Also works around MySQL bug #59393 wrt. skip-innodb
+                sql = "SHOW ENGINES";
+                using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
                 {
-                    while (reader.Read())
+                    using (MySqlDataReader reader = command.ExecuteReader())
                     {
-                        string engine = reader.GetString(0).ToLower(Settings.Culture);
-                        if (engine == "federated" || engine == "blackhole")
+                        while (reader.Read())
                         {
-                            engine += "_engine";
-                        }
-                        else if (engine == "berkeleydb")
-                        {
-                            engine = "bdb";
-                        }
+                            string engine = reader.GetString(0).ToLower(Settings.Culture);
+                            if (engine == "federated" || engine == "blackhole")
+                            {
+                                engine += "_engine";
+                            }
+                            else if (engine == "berkeleydb")
+                            {
+                                engine = "bdb";
+                            }
 
-                        string value = reader.GetString(1);
-                        if (value == "DEFAULT")
-                        {
-                            value = "YES";
-                        }
+                            string value = reader.GetString(1);
+                            if (value == "DEFAULT")
+                            {
+                                value = "YES";
+                            }
 
-                        string key = "have_" + engine;
-                        if (this.Variables.ContainsKey(key))
-                        {
-                            this.Variables[key] = value;
-                        }
-                        else
-                        {
-                            this.Variables.Add(key, value);
+                            string key = "have_" + engine;
+                            if (this.Variables.ContainsKey(key))
+                            {
+                                this.Variables[key] = value;
+                            }
+                            else
+                            {
+                                this.Variables.Add(key, value);
+                            }
                         }
                     }
                 }
