@@ -392,14 +392,14 @@ namespace MySqlTuner
                 {
                     while (reader.Read())
                     {
-                        string key = reader.GetString(0);
+                        string key = GetStringFromReader(reader, 0);
                         if (this.Variables.ContainsKey(key))
                         {
-                            this.Variables[key] = reader.GetString(1);
+                            this.Variables[key] = GetStringFromReader(reader, 1);
                         }
                         else
                         {
-                            this.Variables.Add(key, reader.GetString(1));
+                            this.Variables.Add(key, GetStringFromReader(reader, 1));
                         }
                     }
                 }
@@ -413,14 +413,14 @@ namespace MySqlTuner
                 {
                     while (reader.Read())
                     {
-                        string key = reader.GetString(0);
+                        string key = GetStringFromReader(reader, 0);
                         if (this.Status.ContainsKey(key))
                         {
-                            this.Status[key] = reader.GetString(1);
+                            this.Status[key] = GetStringFromReader(reader, 1);
                         }
                         else
                         {
-                            this.Status.Add(key, reader.GetString(1));
+                            this.Status.Add(key, GetStringFromReader(reader, 1));
                         }
                     }
                 }
@@ -452,7 +452,7 @@ namespace MySqlTuner
                     {
                         while (reader.Read())
                         {
-                            string engine = reader.GetString(0).ToLower(Settings.Culture);
+                            string engine = GetStringFromReader(reader, 0).ToLower(Settings.Culture);
                             if (engine == "federated" || engine == "blackhole")
                             {
                                 engine += "_engine";
@@ -462,7 +462,7 @@ namespace MySqlTuner
                                 engine = "bdb";
                             }
 
-                            string value = reader.GetString(1);
+                            string value = GetStringFromReader(reader, 1);
                             if (value == "DEFAULT")
                             {
                                 value = "YES";
@@ -493,15 +493,15 @@ namespace MySqlTuner
                     {
                         while (reader.Read())
                         {
-                            string key = reader.GetString(0);
+                            string key = GetStringFromReader(reader, 0);
                             long size;
-                            if (!long.TryParse(reader.GetString(1), out size))
+                            if (!long.TryParse(GetStringFromReader(reader, 1), out size))
                             {
                                 size = 0;
                             }
 
                             long count;
-                            if (!long.TryParse(reader.GetString(2), out count))
+                            if (!long.TryParse(GetStringFromReader(reader, 2), out count))
                             {
                                 count = 0;
                             }
@@ -561,7 +561,7 @@ namespace MySqlTuner
                     {
                         while (reader.Read())
                         {
-                            databases.Add(reader.GetString(0));
+                            databases.Add(GetStringFromReader(reader, 0));
                         }
                     }
                 }
@@ -583,18 +583,18 @@ namespace MySqlTuner
                             {
                                 while (reader.Read())
                                 {
-                                    string key = reader.GetString(1);
+                                    string key = GetStringFromReader(reader, 1);
                                     long size;
                                     long dataFree;
                                     if (this.Version.Major == 3 || (this.Version.Major == 4 && this.Version.Minor == 0))
                                     {
                                         // MySQL 3.23/4.0 keeps Data_Length in the 6th column
-                                        if (!long.TryParse(reader.GetString(5), out size))
+                                        if (!long.TryParse(GetStringFromReader(reader, 5), out size))
                                         {
                                             size = 0;
                                         }
 
-                                        if (!long.TryParse(reader.GetString(8), out dataFree))
+                                        if (!long.TryParse(GetStringFromReader(reader, 8), out dataFree))
                                         {
                                             dataFree = 0;
                                         }
@@ -602,12 +602,12 @@ namespace MySqlTuner
                                     else
                                     {
                                         // MySQL 4.1+ keeps Data_Length in the 7th column
-                                        if (!long.TryParse(reader.GetString(6), out size))
+                                        if (!long.TryParse(GetStringFromReader(reader, 6), out size))
                                         {
                                             size = 0;
                                         }
 
-                                        if (!long.TryParse(reader.GetString(9), out dataFree))
+                                        if (!long.TryParse(GetStringFromReader(reader, 9), out dataFree))
                                         {
                                             dataFree = 0;
                                         }
@@ -678,6 +678,23 @@ namespace MySqlTuner
                 // Note disposing has been done.
                 this.disposed = true;
             }
+        }
+
+        /// <summary>
+        /// Gets the string from reader for the specified column number.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="i">The column number.</param>
+        /// <returns>
+        /// The string.
+        /// </returns>
+        /// <remarks>
+        /// Returns an empty string on DBNull.
+        /// </remarks>
+        private static string GetStringFromReader(MySqlDataReader reader, int i)
+        {
+            // If I didn't need .Net 2.0 compatibility, I would write this as an extension method
+            return reader.IsDBNull(i) ? string.Empty : reader.GetString(i);
         }
     }
 }

@@ -81,7 +81,7 @@ namespace MySqlTuner
                 this.VariablesToAdjust = new List<string>();
 
                 // Post the first message!
-                this.PrintMessage(Status.Info, "MySQL Tuner " + Assembly.GetExecutingAssembly().GetName().Version.ToString(2) + " - Peter Chapman <peter@conglomo.co.nz>");
+                this.PrintMessage(Status.Info, "MySQL Tuner " + Assembly.GetExecutingAssembly().GetName().Version.ToString(3) + " - Peter Chapman <peter@conglomo.co.nz>");
 
                 // Show the server
                 this.PrintMessage(Status.Info, "Performing tests on " + this.Server.Host + ":" + this.Server.Port + " at " + DateTime.Now.ToString(Settings.Culture.DateTimeFormat.FullDateTimePattern, Settings.Culture));
