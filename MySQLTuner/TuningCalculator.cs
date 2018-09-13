@@ -102,9 +102,8 @@ namespace MySqlTuner
                 else
                 {
                     // Ask for the physical memory value
-                    ulong physicalMemory;
                     string memory = Interaction.InputBox("How much physical memory is on the server (in megabytes)?");
-                    if (string.IsNullOrEmpty(memory) || !ulong.TryParse(memory, out physicalMemory))
+                    if (string.IsNullOrEmpty(memory) || !ulong.TryParse(memory, out ulong physicalMemory))
                     {
                         this.PrintMessage(Status.Info, "Assuming the same amount of physical memory as this computer");
                         physicalMemory = computerInfo.TotalPhysicalMemory;
@@ -118,9 +117,8 @@ namespace MySqlTuner
                     this.Server.PhysicalMemory = physicalMemory;
 
                     // Ask for the swap memory value
-                    ulong swapMemory;
                     memory = Interaction.InputBox("How much swap space is on the server (in megabytes)?");
-                    if (string.IsNullOrEmpty(memory) || !ulong.TryParse(memory, out swapMemory))
+                    if (string.IsNullOrEmpty(memory) || !ulong.TryParse(memory, out ulong swapMemory))
                     {
                         this.PrintMessage(Status.Info, "Assuming the same amount of swap space as this computer");
                         swapMemory = computerInfo.TotalVirtualMemory - this.Server.PhysicalMemory;

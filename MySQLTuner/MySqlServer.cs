@@ -494,14 +494,12 @@ namespace MySqlTuner
                         while (reader.Read())
                         {
                             string key = GetStringFromReader(reader, 0);
-                            long size;
-                            if (!long.TryParse(GetStringFromReader(reader, 1), out size))
+                            if (!long.TryParse(GetStringFromReader(reader, 1), out long size))
                             {
                                 size = 0;
                             }
 
-                            long count;
-                            if (!long.TryParse(GetStringFromReader(reader, 2), out count))
+                            if (!long.TryParse(GetStringFromReader(reader, 2), out long count))
                             {
                                 count = 0;
                             }
@@ -539,8 +537,7 @@ namespace MySqlTuner
                     object scalar = command.ExecuteScalar();
                     if (scalar != null)
                     {
-                        long fragmentedTables;
-                        if (!long.TryParse(scalar.ToString(), out fragmentedTables))
+                        if (!long.TryParse(scalar.ToString(), out long fragmentedTables))
                         {
                             fragmentedTables = 0;
                         }

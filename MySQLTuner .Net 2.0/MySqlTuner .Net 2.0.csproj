@@ -48,6 +48,7 @@
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -86,9 +87,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\MySQLTuner\Class Diagram.cd">
-      <Link>Class Diagram.cd</Link>
-    </None>
     <None Include="..\MySQLTuner\MySqlTuner.snk">
       <Link>MySqlTuner.snk</Link>
     </None>

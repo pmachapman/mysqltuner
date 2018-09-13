@@ -8,7 +8,6 @@ namespace MySqlTuner
 {
     using System;
     using System.Globalization;
-    using System.Runtime.InteropServices;
 
     /// <summary>
     /// Global settings.
@@ -44,8 +43,7 @@ namespace MySqlTuner
                 }
                 else
                 {
-                    bool flag;
-                    return (DoesWin32MethodExist("kernel32.dll", "IsWow64Process") && NativeMethods.IsWow64Process(NativeMethods.GetCurrentProcess(), out flag)) && flag;
+                    return (DoesWin32MethodExist("kernel32.dll", "IsWow64Process") && NativeMethods.IsWow64Process(NativeMethods.GetCurrentProcess(), out bool flag)) && flag;
                 }
             }
         }
