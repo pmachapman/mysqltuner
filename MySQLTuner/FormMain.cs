@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="FormMain.cs" company="Peter Chapman">
-// Copyright 2017 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.
+// Copyright 2018 Peter Chapman. See LICENCE.md for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 

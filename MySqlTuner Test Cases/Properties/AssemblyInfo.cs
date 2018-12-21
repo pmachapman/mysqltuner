@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="AssemblyInfo.cs" company="Peter Chapman">
-// Copyright 2017 Peter Chapman. See http://mysqltuner.codeplex.com/license for licence details.
+// Copyright 2018 Peter Chapman. See LICENCE.md for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Peter Chapman")]
 [assembly: AssemblyProduct("MySQL Tuner Test Cases")]
-[assembly: AssemblyCopyright("Copyright © 2017 Peter Chapman")]
+[assembly: AssemblyCopyright("Copyright 2018 Peter Chapman. See LICENCE.md for licence details.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
