@@ -122,6 +122,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\MySQLTuner\DataGridViewImageWithAltTextCell.cs">
+      <Link>DataGridViewImageWithAltTextCell.cs</Link>
+    </Compile>
     <Compile Include="..\MySQLTuner\FormLogOn.cs">
       <Link>FormLogOn.cs</Link>
       <SubType>Form</SubType>

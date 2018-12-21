@@ -88,6 +88,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataGridViewImageWithAltTextCell.cs" />
     <Compile Include="FormLogOn.cs">
       <SubType>Form</SubType>
     </Compile>

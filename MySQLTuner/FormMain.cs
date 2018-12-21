@@ -64,22 +64,26 @@ namespace MySqlTuner
                 // Setup the cells and add the row
                 using (DataGridViewRow row = new DataGridViewRow())
                 {
-                    using (DataGridViewCell statusCell = new DataGridViewImageCell())
+                    using (DataGridViewImageWithAltTextCell statusCell = new DataGridViewImageWithAltTextCell())
                     {
                         switch (messageStatus)
                         {
                             case Status.Pass:
-                                statusCell.Value = (Image)Properties.Resources.Pass;
+                                statusCell.AltText = "Pass";
+                                statusCell.Value = Properties.Resources.Pass;
                                 break;
                             case Status.Fail:
-                                statusCell.Value = (Image)Properties.Resources.Fail;
+                                statusCell.AltText = "Fail";
+                                statusCell.Value = Properties.Resources.Fail;
                                 break;
                             case Status.Info:
                             default:
-                                statusCell.Value = (Image)Properties.Resources.Info;
+                                statusCell.AltText = "Info";
+                                statusCell.Value = Properties.Resources.Info;
                                 break;
                             case Status.Recommendation:
-                                statusCell.Value = (Image)Properties.Resources.Recommendation;
+                                statusCell.AltText = "Recommendation";
+                                statusCell.Value = Properties.Resources.Recommendation;
                                 break;
                         }
 
