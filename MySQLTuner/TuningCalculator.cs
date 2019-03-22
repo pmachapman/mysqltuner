@@ -565,7 +565,7 @@ namespace MySqlTuner
             this.Calculations.Add("total_myisam_indexes", this.Server.TotalMyIsamIndexes);
 
             // Query cache
-            if (this.Server.Version.Major > 3)
+            if (this.Server.Version.Major > 3 && this.Server.Version.Major < 8)
             {
                 this.Calculations.Add("query_cache_efficiency", (long)Math.Ceiling((Convert.ToDouble(this.Server.Status["Qcache_hits"], Settings.Culture) / (Convert.ToDouble(this.Server.Status["Com_select"], Settings.Culture) + Convert.ToDouble(this.Server.Status["Qcache_hits"], Settings.Culture))) * 100D));
                 if (this.Server.Variables["query_cache_size"] != "0")
@@ -799,7 +799,11 @@ namespace MySqlTuner
             }
 
             // Query cache
-            if (this.Server.Version.Major < 4)
+            if (this.Server.Version.Major >= 8)
+            {
+                // MySQL 8.0 removed support for the query cache
+            }
+            else if (this.Server.Version.Major < 4)
             {
                 // MySQL versions < 4.01 don't support query caching
                 this.Recommendations.Add("Upgrade MySQL to version 4+ to utilize query caching");
