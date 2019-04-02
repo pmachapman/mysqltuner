@@ -27,7 +27,7 @@ namespace MySqlTuner
         public string AltText { get; set; }
 
         /// <summary>
-        /// Retrieves the formatted value of the cell to copy to the <see cref="T:System.Windows.Forms.Clipboard" />.
+        /// Retrieves the formatted value of the cell to copy to the <see cref="System.Windows.Forms.Clipboard" />.
         /// </summary>
         /// <param name="rowIndex">The zero-based index of the row containing the cell.</param>
         /// <param name="firstCell"><see langword="true" /> to indicate that the cell is in the first column of the region defined by the selected cells; otherwise, <see langword="false" />.</param>
@@ -36,7 +36,7 @@ namespace MySqlTuner
         /// <param name="inLastRow"><see langword="true" /> to indicate that the cell is in the last row of the region defined by the selected cells; otherwise, <see langword="false" />.</param>
         /// <param name="format">The current format string of the cell.</param>
         /// <returns>
-        /// An <see cref="T:System.Object" /> that represents the value of the cell to copy to the <see cref="T:System.Windows.Forms.Clipboard" />.
+        /// An <see cref="object" /> that represents the value of the cell to copy to the <see cref="System.Windows.Forms.Clipboard" />.
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">rowIndex</exception>
         protected override object GetClipboardContent(int rowIndex, bool firstCell, bool lastCell, bool inFirstRow, bool inLastRow, string format)
