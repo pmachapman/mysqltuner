@@ -11,7 +11,7 @@ namespace MySqlTuner.Test
 
     /// <summary>
     /// This is a test class for <c>SettingsTest</c> and is intended
-    /// to contain all <c>SettingsTest</c> Unit Tests
+    /// to contain all <c>SettingsTest</c> Unit Tests.
     /// </summary>
     [TestClass]
     public class SettingsTest

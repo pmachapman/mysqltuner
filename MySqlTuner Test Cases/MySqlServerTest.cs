@@ -11,7 +11,7 @@ namespace MySqlTuner.Test
 
     /// <summary>
     /// This is a test class for <c>MySqlServerTest</c> and is intended
-    /// to contain all <c>MySqlServerTest</c> Unit Tests
+    /// to contain all <c>MySqlServerTest</c> Unit Tests.
     /// </summary>
     [TestClass]
     public class MySqlServerTest

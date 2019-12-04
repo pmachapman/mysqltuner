@@ -66,7 +66,7 @@ namespace MySqlTuner
         public abstract void ProgressComplete(bool complete);
 
         /// <summary>
-        /// Performs the calculations
+        /// Performs the calculations.
         /// </summary>
         /// <param name="server">The server to calculate.</param>
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "This only supports english")]

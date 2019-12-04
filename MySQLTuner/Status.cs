@@ -29,6 +29,6 @@ namespace MySqlTuner
         /// <summary>
         /// The notice is a recommendation notice.
         /// </summary>
-        Recommendation = 3
+        Recommendation = 3,
     }
 }

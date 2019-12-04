@@ -38,7 +38,7 @@ namespace MySqlTuner
         /// <returns>
         /// An <see cref="object" /> that represents the value of the cell to copy to the <see cref="System.Windows.Forms.Clipboard" />.
         /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException">rowIndex</exception>
+        /// <exception cref="ArgumentOutOfRangeException">rowIndex; The row index is greater than the number of rows, or negative.</exception>
         protected override object GetClipboardContent(int rowIndex, bool firstCell, bool lastCell, bool inFirstRow, bool inLastRow, string format)
         {
             if (this.DataGridView == null)
@@ -194,7 +194,8 @@ namespace MySqlTuner
             if (escapeApplied)
             {
                 output.Write('"'); // terminating double-quote.
-                // the caller is responsible for inserting the opening double-quote.
+
+                // NOTE: the caller is responsible for inserting the opening double-quote.
             }
         }
 
