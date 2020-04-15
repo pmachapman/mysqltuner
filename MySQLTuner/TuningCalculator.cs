@@ -138,6 +138,9 @@ namespace MySqlTuner
                 // Check current MySQL version
                 this.ValidateMySqlVersion();
 
+                // See if we are on a 64-bit or 32-bit architecture
+                this.CheckArchitecture();
+
                 // Show enabled storage engines
                 this.CheckStorageEngines();
 
@@ -349,17 +352,43 @@ namespace MySqlTuner
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "This only supports english")]
         private void ValidateMySqlVersion()
         {
-            if (this.Server.Version.Major < 5)
-            {
-                this.PrintMessage(Status.Fail, "Your MySQL version " + this.Server.Variables["version"] + " is EOL software!  Upgrade soon!");
-            }
-            else if (this.Server.Version.Major == 5)
+            if (this.Server.Version.Major == 8
+                || (this.Server.Version.Major == 5 && this.Server.Version.Minor == 6)
+                || (this.Server.Version.Major == 5 && this.Server.Version.Minor == 7)
+                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 1)
+                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 2)
+                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 3)
+                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 4))
             {
                 this.PrintMessage(Status.Pass, "Currently running supported MySQL version " + this.Server.Variables["version"]);
+            }
+            else if (this.Server.Version.Major <= 5 || this.Server.Version.Major == 10)
+            {
+                this.PrintMessage(Status.Fail, "Your MySQL version " + this.Server.Variables["version"] + " is EOL software!  Upgrade soon!");
             }
             else
             {
                 this.PrintMessage(Status.Fail, "Currently running unsupported MySQL version " + this.Server.Variables["version"]);
+            }
+        }
+
+        /// <summary>
+        /// Checks the architecture.
+        /// </summary>
+        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "This only supports english")]
+        private void CheckArchitecture()
+        {
+            if (Settings.Is64BitOperatingSystem)
+            {
+                this.PrintMessage(Status.Pass, "Operating on 64-bit architecture");
+            }
+            else if (this.Server.PhysicalMemory > 2147483648)
+            {
+                this.PrintMessage(Status.Fail, "Switch to 64-bit OS - MySQL cannot currently use all of your RAM");
+            }
+            else
+            {
+                this.PrintMessage(Status.Pass, "Operating on 32-bit architecture with less than 2GB RAM");
             }
         }
 

@@ -188,6 +188,22 @@ namespace MySqlTuner
         public uint Port { get; set; }
 
         /// <summary>
+        /// Gets the replication status.
+        /// </summary>
+        /// <value>
+        /// The replication status.
+        /// </value>
+        public Dictionary<string, string> ReplicationStatus { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the number of slaves.
+        /// </summary>
+        /// <value>
+        /// The number of slaves.
+        /// </value>
+        public long Slaves { get; set; }
+
+        /// <summary>
         /// Gets the status.
         /// </summary>
         /// <value>
@@ -427,6 +443,38 @@ namespace MySqlTuner
                 }
             }
 
+            // This only present in MySQL 5.0.3 or higher
+            if (this.Version.Major >= 5 && !this.Variables.ContainsKey("innodb_support_xa"))
+            {
+                this.Variables["innodb_support_xa"] = "ON";
+            }
+
+            if (this.Variables.ContainsKey("wsrep_provider_options")
+                && !string.IsNullOrEmpty(this.Variables["wsrep_provider_options"])
+                && this.Variables.ContainsKey("wsrep_on")
+                && this.Variables["wsrep_on"] != "OFF")
+            {
+                if (this.Variables.ContainsKey("have_galera"))
+                {
+                    this.Variables["have_galera"] = "NO";
+                }
+                else
+                {
+                    this.Variables.Add("have_galera", "NO");
+                }
+            }
+            else
+            {
+                if (this.Variables.ContainsKey("have_galera"))
+                {
+                    this.Variables["have_galera"] = "YES";
+                }
+                else
+                {
+                    this.Variables.Add("have_galera", "YES");
+                }
+            }
+
             // Workaround for MySQL bug #59393 wrt. ignore-builtin-innodb
             if (this.Variables.ContainsKey("ignore_builtin_innodb") && this.Variables["ignore_builtin_innodb"] == "ON")
             {
@@ -437,6 +485,44 @@ namespace MySqlTuner
                 else
                 {
                     this.Variables.Add("have_innodb", "NO");
+                }
+            }
+
+            // Support GTID MODE FOR MARIADB
+            // Issue MariaDB GTID mode #272
+            if (this.Variables.ContainsKey("gtid_strict_mode"))
+            {
+                if (this.Variables.ContainsKey("gtid_mode"))
+                {
+                    this.Variables["gtid_mode"] = this.Variables["gtid_strict_mode"];
+                }
+                else
+                {
+                    this.Variables.Add("gtid_mode", this.Variables["gtid_strict_mode"]);
+                }
+            }
+
+            if (this.Variables.ContainsKey("thread_pool_size")
+                && Convert.ToInt64(this.Variables["thread_pool_size"], Settings.Culture) > 0L)
+            {
+                if (this.Variables.ContainsKey("have_threadpool"))
+                {
+                    this.Variables["have_threadpool"] = "YES";
+                }
+                else
+                {
+                    this.Variables.Add("have_threadpool", "YES");
+                }
+            }
+            else
+            {
+                if (this.Variables.ContainsKey("have_threadpool"))
+                {
+                    this.Variables["have_threadpool"] = "NO";
+                }
+                else
+                {
+                    this.Variables.Add("have_threadpool", "NO");
                 }
             }
 
@@ -479,6 +565,35 @@ namespace MySqlTuner
                                 this.Variables.Add(key, value);
                             }
                         }
+                    }
+                }
+            }
+
+            // Get the replication status
+            sql = "SHOW SLAVE STATUS";
+            using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
+            {
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            this.ReplicationStatus.Add(reader.GetName(i), GetStringFromReader(reader, i));
+                        }
+                    }
+                }
+            }
+
+            // Get the number of slaves
+            sql = "SHOW SLAVE HOSTS";
+            using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
+            {
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        this.Slaves++;
                     }
                 }
             }
