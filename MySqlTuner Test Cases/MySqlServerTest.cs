@@ -6,6 +6,7 @@
 
 namespace MySqlTuner.Test
 {
+    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using MySqlTuner;
 
@@ -23,6 +24,7 @@ namespace MySqlTuner.Test
         /// <value>
         /// The test context.
         /// </value>
+        [CLSCompliant(false)]
         public TestContext TestContext { get; set; }
 
         /// <summary>
