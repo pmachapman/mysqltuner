@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Settings.cs" company="Peter Chapman">
-// Copyright 2019 Peter Chapman. See LICENCE.md for licence details.
+// Copyright 2012-2022 Peter Chapman. See LICENCE.md for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -17,14 +17,10 @@ namespace MySqlTuner
         /// <summary>
         /// Gets the program's culture.
         /// </summary>
-        public static CultureInfo Culture
-        {
-            get
-            {
-                // TODO: Set this to the local culture, allowing override via app.config
-                return CultureInfo.CreateSpecificCulture("en-NZ");
-            }
-        }
+        /// <remarks>
+        /// TODO: Set this to the local culture, allowing override via app.config.
+        /// </remarks>
+        public static CultureInfo Culture => CultureInfo.CreateSpecificCulture("en-NZ");
 
         /// <summary>
         /// Gets a value indicating whether this is running on a 64-bit operating system.
@@ -43,7 +39,7 @@ namespace MySqlTuner
                 }
                 else
                 {
-                    return (DoesWin32MethodExist("kernel32.dll", "IsWow64Process") && NativeMethods.IsWow64Process(NativeMethods.GetCurrentProcess(), out bool flag)) && flag;
+                    return DoesWin32MethodExist("kernel32.dll", "IsWow64Process") && NativeMethods.IsWow64Process(NativeMethods.GetCurrentProcess(), out bool flag) && flag;
                 }
             }
         }

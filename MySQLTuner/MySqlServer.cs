@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="MySqlServer.cs" company="Peter Chapman">
-// Copyright 2019 Peter Chapman. See LICENCE.md for licence details.
+// Copyright 2012-2022 Peter Chapman. See LICENCE.md for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -20,14 +20,14 @@ namespace MySqlTuner
     public class MySqlServer : IDisposable
     {
         /// <summary>
+        /// Failure messages during server load.
+        /// </summary>
+        private readonly List<string> failureMessages = new List<string>();
+
+        /// <summary>
         /// Track whether Dispose has been called.
         /// </summary>
         private bool disposed = false;
-
-        /// <summary>
-        /// Failure messages during server load.
-        /// </summary>
-        private List<string> failureMessages = new List<string>();
 
         /// <summary>
         /// Initialises a new instance of the <see cref="MySqlServer"/> class.
@@ -159,14 +159,10 @@ namespace MySqlTuner
         /// <value>
         ///   <c>true</c> if this instance is local; otherwise, <c>false</c>.
         /// </value>
-        public bool IsLocal
-        {
-            get
-            {
-                // TODO: A more accurate test than the one below!
-                return this.Host.ToUpper(Settings.Culture) == "LOCALHOST" || this.Host == "127.0.0.1" || this.Host == "::1";
-            }
-        }
+        /// <remarks>
+        /// TODO: A more accurate test than the one below.
+        /// </remarks>
+        public bool IsLocal => this.Host.ToUpper(Settings.Culture) == "LOCALHOST" || this.Host == "127.0.0.1" || this.Host == "::1";
 
         /// <summary>
         /// Gets or sets the last error.
@@ -238,7 +234,6 @@ namespace MySqlTuner
         /// <summary>
         /// Gets the total number of MyISAM indexes.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "MyIsam", Justification = "It is the correct name, not hungarian notation.")]
         public long TotalMyIsamIndexes
         {
             get
@@ -423,9 +418,9 @@ namespace MySqlTuner
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "This is a complex routine")]
-        [SuppressMessage("Microsoft.Performance", "CA1809:AvoidExcessiveLocals", Justification = "This is a complex routine")]
+#pragma warning disable IDE0079 // Remove unnecessary suppression
         [SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "The value in the query comes from the MySQL System tables.")]
+#pragma warning restore IDE0079 // Remove unnecessary suppression
         public void Load()
         {
             // We need to initiate at least one query so that our data is useable
@@ -855,11 +850,8 @@ namespace MySqlTuner
         /// </returns>
         /// <remarks>
         /// Returns an empty string on DBNull.
+        /// NOTE: If I didn't need .Net 2.0 compatibility, I would write this as an extension method.
         /// </remarks>
-        private static string GetStringFromReader(MySqlDataReader reader, int i)
-        {
-            // If I didn't need .Net 2.0 compatibility, I would write this as an extension method
-            return reader.IsDBNull(i) ? string.Empty : reader.GetString(i);
-        }
+        private static string GetStringFromReader(MySqlDataReader reader, int i) => reader.IsDBNull(i) ? string.Empty : reader.GetString(i);
     }
 }

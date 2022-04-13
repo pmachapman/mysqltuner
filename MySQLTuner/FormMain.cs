@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="FormMain.cs" company="Peter Chapman">
-// Copyright 2019 Peter Chapman. See LICENCE.md for licence details.
+// Copyright 2012-2022 Peter Chapman. See LICENCE.md for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -133,30 +133,23 @@ namespace MySqlTuner
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.ComponentModel.DoWorkEventArgs"/> instance containing the event data.</param>
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            this.Calculate(this.Server);
-        }
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) => this.Calculate(this.Server);
 
         /// <summary>
         /// Handles the Click event of the Close button.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        private void Close_Click(object sender, System.EventArgs e)
-        {
-            this.Close();
-        }
+        private void Close_Click(object sender, System.EventArgs e) => this.Close();
 
         /// <summary>
         /// Handles the Load event of the Main form.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        private void FormMain_Load(object sender, System.EventArgs e)
-        {
-            // Start the background worker
-            this.backgroundWorker.RunWorkerAsync();
-        }
+        /// <remarks>
+        /// Starts the background worker.
+        /// </remarks>
+        private void FormMain_Load(object sender, System.EventArgs e) => this.backgroundWorker.RunWorkerAsync();
     }
 }

@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="FormLogOn.cs" company="Peter Chapman">
-// Copyright 2019 Peter Chapman. See LICENCE.md for licence details.
+// Copyright 2012-2022 Peter Chapman. See LICENCE.md for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -41,10 +41,7 @@ namespace MySqlTuner
         /// Opens the main form.
         /// </summary>
         /// <param name="server">The server.</param>
-        public static void OpenMainForm(MySqlServer server)
-        {
-            Application.Run(new FormMain(server));
-        }
+        public static void OpenMainForm(MySqlServer server) => Application.Run(new FormMain(server));
 
         /// <summary>
         /// Handles the Click event of the cancel button.
