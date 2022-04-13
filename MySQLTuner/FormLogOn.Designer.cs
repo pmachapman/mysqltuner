@@ -99,6 +99,7 @@ namespace MySqlTuner
             this.cancel = new System.Windows.Forms.Button();
             this.ok = new System.Windows.Forms.Button();
             this.port = new System.Windows.Forms.MaskedTextBox();
+            this.useSsl = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // host
@@ -164,7 +165,7 @@ namespace MySqlTuner
             // cancel
             // 
             this.cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancel.Location = new System.Drawing.Point(190, 90);
+            this.cancel.Location = new System.Drawing.Point(190, 113);
             this.cancel.Name = "cancel";
             this.cancel.Size = new System.Drawing.Size(75, 23);
             this.cancel.TabIndex = 2;
@@ -174,7 +175,7 @@ namespace MySqlTuner
             // 
             // ok
             // 
-            this.ok.Location = new System.Drawing.Point(108, 90);
+            this.ok.Location = new System.Drawing.Point(108, 113);
             this.ok.Name = "ok";
             this.ok.Size = new System.Drawing.Size(75, 23);
             this.ok.TabIndex = 1;
@@ -192,13 +193,24 @@ namespace MySqlTuner
             this.port.TabIndex = 4;
             this.port.Text = "3306";
             // 
+            // useSsl
+            // 
+            this.useSsl.AutoSize = true;
+            this.useSsl.Location = new System.Drawing.Point(73, 90);
+            this.useSsl.Name = "useSsl";
+            this.useSsl.Size = new System.Drawing.Size(125, 17);
+            this.useSsl.TabIndex = 10;
+            this.useSsl.Text = "Use SSL Connection";
+            this.useSsl.UseVisualStyleBackColor = true;
+            // 
             // FormLogOn
             // 
             this.AcceptButton = this.ok;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancel;
-            this.ClientSize = new System.Drawing.Size(277, 125);
+            this.ClientSize = new System.Drawing.Size(277, 148);
+            this.Controls.Add(this.useSsl);
             this.Controls.Add(this.port);
             this.Controls.Add(this.ok);
             this.Controls.Add(this.cancel);
@@ -221,5 +233,7 @@ namespace MySqlTuner
         }
 
         #endregion
+
+        private System.Windows.Forms.CheckBox useSsl;
     }
 }

@@ -9,6 +9,7 @@ namespace MySqlTuner
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Security.Authentication;
     using System.Text.RegularExpressions;
     using MySql.Data.MySqlClient;
 
@@ -123,12 +124,12 @@ namespace MySqlTuner
         public Dictionary<string, long> EngineStatistics { get; private set; }
 
         /// <summary>
-        /// Gets or sets the number of fragmented tables.
+        /// Gets the number of fragmented tables.
         /// </summary>
         /// <value>
         /// The fragmented tables count.
         /// </value>
-        public long FragmentedTables { get; set; }
+        public long FragmentedTables { get; private set; }
 
         /// <summary>
         /// Gets or sets the host.
@@ -272,6 +273,14 @@ namespace MySqlTuner
         public string UserName { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this instance's connection should use SSL.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance's connection should use SSL; otherwise, <c>false</c>.
+        /// </value>
+        public bool UseSsl { get; set; }
+
+        /// <summary>
         /// Gets the variables.
         /// </summary>
         /// <value>
@@ -350,6 +359,9 @@ namespace MySqlTuner
                 Password = this.Password,
                 ConnectionTimeout = 30, // Stop any time out issues
                 DefaultCommandTimeout = 0,
+#if !MYSQL40
+                SslMode = this.UseSsl ? MySqlSslMode.Preferred : MySqlSslMode.None,
+#endif
             };
 
             // Create the connection
@@ -365,7 +377,8 @@ namespace MySqlTuner
             catch (Exception ex)
             {
                 if (ex is MySqlException
-                    || ex is NotSupportedException)
+                    || ex is NotSupportedException
+                    || ex is AuthenticationException)
                 {
                     // Dispose of the connection
                     if (this.Connection != null)
@@ -377,7 +390,14 @@ namespace MySqlTuner
                     this.Connection = null;
 
                     // Set the last error
-                    this.LastError = ex.Message;
+                    if (ex is AuthenticationException)
+                    {
+                        this.LastError = $"There was an error making a secure connection. Please try again using an unencrypted connection. Details:\r\n{ex.Message}";
+                    }
+                    else
+                    {
+                        this.LastError = ex.Message;
+                    }
                 }
                 else
                 {

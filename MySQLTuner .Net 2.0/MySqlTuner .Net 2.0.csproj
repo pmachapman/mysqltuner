@@ -95,9 +95,6 @@
       <Link>App.manifest</Link>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="..\MySQLTuner\Settings.StyleCop">
-      <Link>Settings.StyleCop</Link>
-    </None>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>

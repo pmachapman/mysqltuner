@@ -41,7 +41,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;MYSQL40</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\MySqlTuner.xml</DocumentationFile>
@@ -96,9 +96,6 @@
       <Link>App.manifest</Link>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="..\MySQLTuner\Settings.StyleCop">
-      <Link>Settings.StyleCop</Link>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">

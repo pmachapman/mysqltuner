@@ -20,6 +20,13 @@ namespace MySqlTuner
         public FormLogOn()
         {
             this.InitializeComponent();
+
+            // Set up the use SSL checkbox
+#if MYSQL40
+            this.useSsl.Enabled = false;
+#else
+            this.useSsl.Checked = true;
+#endif
         }
 
         /// <summary>
@@ -70,6 +77,7 @@ namespace MySqlTuner
                 Port = portNumber,
                 UserName = this.userName.Text,
                 Password = this.password.Text,
+                UseSsl = this.useSsl.Checked,
             };
             this.Server.Open();
 

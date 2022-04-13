@@ -141,6 +141,8 @@ namespace MySqlTuner
                 // See if we are on a 64-bit or 32-bit architecture
                 this.CheckArchitecture();
 
+                // Do not check for System Recommendations as this is running on Windows
+
                 // Show enabled storage engines
                 this.CheckStorageEngines();
 
