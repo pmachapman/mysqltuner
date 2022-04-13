@@ -135,6 +135,12 @@ namespace MySqlTuner
                 // Load the server values from the database
                 this.Server.Load();
 
+                // Display any failure messages
+                foreach (string failureMessage in server.FailureMessages)
+                {
+                    this.PrintMessage(Status.Fail, failureMessage);
+                }
+
                 // Check current MySQL version
                 this.ValidateMySqlVersion();
 
@@ -355,12 +361,13 @@ namespace MySqlTuner
         private void ValidateMySqlVersion()
         {
             if (this.Server.Version.Major == 8
-                || (this.Server.Version.Major == 5 && this.Server.Version.Minor == 6)
-                || (this.Server.Version.Major == 5 && this.Server.Version.Minor == 7)
-                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 1)
-                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 2)
-                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 3)
-                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 4))
+                || (this.Server.Version.Major == 5 && this.Server.Version.Minor == 7 && DateTime.Today > new DateTime(2023, 10, 31))
+                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 2 && DateTime.Today > new DateTime(2022, 5, 23))
+                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 3 && DateTime.Today > new DateTime(2023, 5, 25))
+                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 4 && DateTime.Today > new DateTime(2024, 6, 18))
+                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 5 && DateTime.Today > new DateTime(2025, 6, 24))
+                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 6 && DateTime.Today > new DateTime(2026, 7, 6))
+                || (this.Server.Version.Major == 10 && this.Server.Version.Minor >= 7))
             {
                 this.PrintMessage(Status.Pass, "Currently running supported MySQL version " + this.Server.Variables["version"]);
             }
@@ -510,23 +517,30 @@ namespace MySqlTuner
             }
 
             // Find any users with no passwords
-            string sql = "SELECT CONCAT(user, '@', host) AS `username` FROM mysql.user WHERE " + passwordColumnName + " = '' OR " + passwordColumnName + " IS NULL ORDER BY `username`";
-            using (MySqlCommand command = new MySqlCommand(sql, this.Server.Connection))
+            try
             {
-                using (MySqlDataReader reader = command.ExecuteReader())
+                string sql = "SELECT CONCAT(user, '@', host) AS `username` FROM mysql.user WHERE " + passwordColumnName + " = '' OR " + passwordColumnName + " IS NULL ORDER BY `username`";
+                using (MySqlCommand command = new MySqlCommand(sql, this.Server.Connection))
                 {
-                    if (reader.HasRows)
+                    using (MySqlDataReader reader = command.ExecuteReader())
                     {
-                        while (reader.Read())
+                        if (reader.HasRows)
                         {
-                            this.PrintMessage(Status.Fail, "User '" + reader.GetString(0) + "' has no password set.");
+                            while (reader.Read())
+                            {
+                                this.PrintMessage(Status.Fail, "User '" + reader.GetString(0) + "' has no password set.");
+                            }
+                        }
+                        else
+                        {
+                            this.PrintMessage(Status.Pass, "All database users have passwords assigned");
                         }
                     }
-                    else
-                    {
-                        this.PrintMessage(Status.Pass, "All database users have passwords assigned");
-                    }
                 }
+            }
+            catch (MySqlException)
+            {
+                this.PrintMessage(Status.Fail, "Could not check for users with no passwords - please give select permissions for this user to the mysql.user table.");
             }
         }
 

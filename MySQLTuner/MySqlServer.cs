@@ -8,6 +8,7 @@ namespace MySqlTuner
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Security.Authentication;
     using System.Text.RegularExpressions;
@@ -22,6 +23,11 @@ namespace MySqlTuner
         /// Track whether Dispose has been called.
         /// </summary>
         private bool disposed = false;
+
+        /// <summary>
+        /// Failure messages during server load.
+        /// </summary>
+        private List<string> failureMessages = new List<string>();
 
         /// <summary>
         /// Initialises a new instance of the <see cref="MySqlServer"/> class.
@@ -122,6 +128,14 @@ namespace MySqlTuner
         /// The engine statistics.
         /// </value>
         public Dictionary<string, long> EngineStatistics { get; private set; }
+
+        /// <summary>
+        /// Gets the failure messages from the server load.
+        /// </summary>
+        /// <value>
+        /// The engine failure messages.
+        /// </value>
+        public ReadOnlyCollection<string> FailureMessages => this.failureMessages.AsReadOnly();
 
         /// <summary>
         /// Gets the number of fragmented tables.
@@ -590,32 +604,50 @@ namespace MySqlTuner
             }
 
             // Get the replication status
-            sql = "SHOW SLAVE STATUS";
-            using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
+            try
             {
-                using (MySqlDataReader reader = command.ExecuteReader())
+                sql = "SHOW SLAVE STATUS";
+                using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
                 {
-                    if (reader.Read())
+                    using (MySqlDataReader reader = command.ExecuteReader())
                     {
-                        for (int i = 0; i < reader.FieldCount; i++)
+                        if (reader.Read())
                         {
-                            this.ReplicationStatus.Add(reader.GetName(i), GetStringFromReader(reader, i));
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                this.ReplicationStatus.Add(reader.GetName(i), GetStringFromReader(reader, i));
+                            }
                         }
                     }
                 }
             }
+            catch (MySqlException)
+            {
+                // This will be an error similar to:
+                // Access denied; you need (at least one of) the SUPER, SLAVE MONITOR privilege(s) for this operation
+                this.failureMessages.Add("You need (at least one of) the SUPER, SLAVE MONITOR privilege(s) to get the replication status.");
+            }
 
             // Get the number of slaves
-            sql = "SHOW SLAVE HOSTS";
-            using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
+            try
             {
-                using (MySqlDataReader reader = command.ExecuteReader())
+                sql = "SHOW SLAVE HOSTS";
+                using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
                 {
-                    while (reader.Read())
+                    using (MySqlDataReader reader = command.ExecuteReader())
                     {
-                        this.Slaves++;
+                        while (reader.Read())
+                        {
+                            this.Slaves++;
+                        }
                     }
                 }
+            }
+            catch (MySqlException)
+            {
+                // This will be an error similar to:
+                // Access denied; you need (at least one of) the REPLICATION MASTER ADMIN privilege(s) for this operation
+                this.failureMessages.Add("You need the REPLICATION MASTER ADMIN privilege to get the number of slaves.");
             }
 
             // Get engine statistics

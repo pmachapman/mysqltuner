@@ -7,6 +7,7 @@
 namespace MySqlTuner
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Runtime.InteropServices;
 
     /// <summary>
@@ -42,6 +43,7 @@ namespace MySqlTuner
         /// If the function succeeds, the return value is the address of the exported function or variable.
         /// </returns>
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true, BestFitMapping = false)]
+        [SuppressMessage("Globalization", "CA2101:Specify marshaling for P/Invoke string arguments", Justification = "The suggestion to change to LPWStr breaks the function")]
         internal static extern IntPtr GetProcAddress(IntPtr module, [MarshalAs(UnmanagedType.LPStr)]string procName);
 
         /// <summary>
