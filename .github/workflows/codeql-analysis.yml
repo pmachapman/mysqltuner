@@ -66,5 +66,8 @@ jobs:
     #   make bootstrap
     #   make release
 
+    - run: |
+       dotnet build
+
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
