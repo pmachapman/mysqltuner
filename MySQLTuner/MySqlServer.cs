@@ -359,7 +359,7 @@ namespace MySqlTuner
                 Password = this.Password,
                 ConnectionTimeout = 30, // Stop any time out issues
                 DefaultCommandTimeout = 0,
-#if !MYSQL40
+#if !NET20
                 SslMode = this.UseSsl ? MySqlSslMode.Preferred : MySqlSslMode.None,
 #endif
             };

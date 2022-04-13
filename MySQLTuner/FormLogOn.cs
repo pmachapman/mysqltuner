@@ -22,7 +22,7 @@ namespace MySqlTuner
             this.InitializeComponent();
 
             // Set up the use SSL checkbox
-#if MYSQL40
+#if NET20
             this.useSsl.Enabled = false;
 #else
             this.useSsl.Checked = true;
