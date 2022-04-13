@@ -273,12 +273,12 @@ namespace MySqlTuner
         public string UserName { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether this instance's connection should use SSL.
+        /// Gets or sets a value indicating whether this instance's connection should use SSL.
         /// </summary>
         /// <value>
         ///   <c>true</c> if this instance's connection should use SSL; otherwise, <c>false</c>.
         /// </value>
-        public bool UseSsl { get; private set; }
+        public bool UseSsl { get; set; }
 
         /// <summary>
         /// Gets the variables.
