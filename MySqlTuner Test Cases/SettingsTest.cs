@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="SettingsTest.cs" company="Peter Chapman">
-// Copyright 2012-2022 Peter Chapman. See LICENCE.md for licence details.
+// Copyright 2012-2024 Peter Chapman. See LICENCE.md for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -8,7 +8,6 @@ namespace MySqlTuner.Test
 {
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using MySqlTuner;
 
     /// <summary>
     /// This is a test class for <c>SettingsTest</c> and is intended

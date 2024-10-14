@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="NativeMethods.cs" company="Peter Chapman">
-// Copyright 2012-2022 Peter Chapman. See LICENCE.md for licence details.
+// Copyright 2012-2024 Peter Chapman. See LICENCE.md for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ namespace MySqlTuner
 #pragma warning disable IDE0079 // Remove unnecessary suppression
         [SuppressMessage("Globalization", "CA2101:Specify marshaling for P/Invoke string arguments", Justification = "The suggestion to change to LPWStr breaks the function")]
 #pragma warning restore IDE0079 // Remove unnecessary suppression
-        internal static extern IntPtr GetProcAddress(IntPtr module, [MarshalAs(UnmanagedType.LPStr)]string procName);
+        internal static extern IntPtr GetProcAddress(IntPtr module, [MarshalAs(UnmanagedType.LPStr)] string procName);
 
         /// <summary>
         /// Determines whether the specified process is running under WOW64.
@@ -58,6 +58,6 @@ namespace MySqlTuner
         /// </returns>
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool IsWow64Process(IntPtr process, [MarshalAs(UnmanagedType.Bool)]out bool wow64Process);
+        internal static extern bool IsWow64Process(IntPtr process, [MarshalAs(UnmanagedType.Bool)] out bool wow64Process);
     }
 }

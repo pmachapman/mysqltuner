@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Program.cs" company="Peter Chapman">
-// Copyright 2012-2022 Peter Chapman. See LICENCE.md for licence details.
+// Copyright 2012-2024 Peter Chapman. See LICENCE.md for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 

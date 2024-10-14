@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Settings.cs" company="Peter Chapman">
-// Copyright 2012-2022 Peter Chapman. See LICENCE.md for licence details.
+// Copyright 2012-2024 Peter Chapman. See LICENCE.md for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -28,10 +28,8 @@ namespace MySqlTuner
         /// <value>
         /// <c>true</c> if this is on a 64-bit operating system; otherwise, <c>false</c>.
         /// </value>
-        public static bool Is64BitOperatingSystem
-        {
-            get
-            {
+        public static bool Is64BitOperatingSystem {
+            get {
                 // A 64-bit program will only run on 64-bit Windows
                 if (IntPtr.Size == 8)
                 {

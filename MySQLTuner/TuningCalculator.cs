@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="TuningCalculator.cs" company="Peter Chapman">
-// Copyright 2012-2022 Peter Chapman. See LICENCE.md for licence details.
+// Copyright 2012-2024 Peter Chapman. See LICENCE.md for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -8,7 +8,6 @@ namespace MySqlTuner
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
     using System.Windows.Forms;
     using Microsoft.VisualBasic;
@@ -75,9 +74,9 @@ namespace MySqlTuner
             {
                 // Set up the calculator
                 this.Server = server;
-                this.Calculations = new Dictionary<string, long>();
-                this.Recommendations = new List<string>();
-                this.VariablesToAdjust = new List<string>();
+                this.Calculations = [];
+                this.Recommendations = [];
+                this.VariablesToAdjust = [];
 
                 // Post the first message!
                 this.PrintMessage(Status.Info, "MySQL Tuner " + Assembly.GetExecutingAssembly().GetName().Version.ToString(3) + " - Peter Chapman <peter@conglomo.co.nz>");
@@ -193,12 +192,8 @@ namespace MySqlTuner
             }
             catch (Exception ex)
             {
-                if (ex is ObjectDisposedException)
-                {
-                    // This is thrown if the form is closed
-                    return;
-                }
-                else
+                // ObjectDisposedException is thrown if the form is closed
+                if (ex is not ObjectDisposedException)
                 {
                     // Display the error to the user
                     this.PrintMessage(Status.Fail, ex.ToString());
@@ -358,18 +353,17 @@ namespace MySqlTuner
         /// </summary>
         private void ValidateMySqlVersion()
         {
-            if (this.Server.Version.Major == 8
-                || (this.Server.Version.Major == 5 && this.Server.Version.Minor == 7 && DateTime.Today > new DateTime(2023, 10, 31))
-                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 2 && DateTime.Today > new DateTime(2022, 5, 23))
-                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 3 && DateTime.Today > new DateTime(2023, 5, 25))
-                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 4 && DateTime.Today > new DateTime(2024, 6, 18))
-                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 5 && DateTime.Today > new DateTime(2025, 6, 24))
-                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 6 && DateTime.Today > new DateTime(2026, 7, 6))
-                || (this.Server.Version.Major == 10 && this.Server.Version.Minor >= 7))
+            if (this.Server.Version.Major == 9
+                || (this.Server.Version.Major == 8 && this.Server.Version.Minor is 0 or 4)
+                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 5 && DateTime.Today <= new DateTime(2025, 6, 24))
+                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 6 && DateTime.Today <= new DateTime(2026, 7, 6))
+                || (this.Server.Version.Major == 10 && this.Server.Version.Minor == 11 && DateTime.Today <= new DateTime(2028, 2, 16))
+                || (this.Server.Version.Major == 11 && this.Server.Version.Minor == 2 && DateTime.Today <= new DateTime(2024, 11, 21))
+                || (this.Server.Version.Major == 11 && this.Server.Version.Minor >= 4))
             {
                 this.PrintMessage(Status.Pass, "Currently running supported MySQL version " + this.Server.Variables["version"]);
             }
-            else if (this.Server.Version.Major <= 5 || this.Server.Version.Major == 10)
+            else if (this.Server.Version.Major is <= 5 or 10 or 11)
             {
                 this.PrintMessage(Status.Fail, "Your MySQL version " + this.Server.Variables["version"] + " is EOL software!  Upgrade soon!");
             }
@@ -514,22 +508,18 @@ namespace MySqlTuner
             try
             {
                 string sql = "SELECT CONCAT(user, '@', host) AS `username` FROM mysql.user WHERE " + passwordColumnName + " = '' OR " + passwordColumnName + " IS NULL ORDER BY `username`";
-                using (MySqlCommand command = new MySqlCommand(sql, this.Server.Connection))
+                using MySqlCommand command = new MySqlCommand(sql, this.Server.Connection);
+                using MySqlDataReader reader = command.ExecuteReader();
+                if (reader.HasRows)
                 {
-                    using (MySqlDataReader reader = command.ExecuteReader())
+                    while (reader.Read())
                     {
-                        if (reader.HasRows)
-                        {
-                            while (reader.Read())
-                            {
-                                this.PrintMessage(Status.Fail, "User '" + reader.GetString(0) + "' has no password set.");
-                            }
-                        }
-                        else
-                        {
-                            this.PrintMessage(Status.Pass, "All database users have passwords assigned");
-                        }
+                        this.PrintMessage(Status.Fail, "User '" + reader.GetString(0) + "' has no password set.");
                     }
+                }
+                else
+                {
+                    this.PrintMessage(Status.Pass, "All database users have passwords assigned");
                 }
             }
             catch (MySqlException)

@@ -1,13 +1,12 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="FormMain.cs" company="Peter Chapman">
-// Copyright 2012-2022 Peter Chapman. See LICENCE.md for licence details.
+// Copyright 2012-2024 Peter Chapman. See LICENCE.md for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 
 namespace MySqlTuner
 {
     using System.ComponentModel;
-    using System.Drawing;
     using System.Windows.Forms;
 
     /// <summary>
@@ -53,51 +52,45 @@ namespace MySqlTuner
         /// <param name="message">The message's notice.</param>
         public override void PrintMessage(Status messageStatus, string message)
         {
-            // See if this is is called from another thread
+            // See if this is called from another thread
             if (this.results.InvokeRequired)
             {
-                PrintDelegate sd = new PrintDelegate(this.PrintMessage);
-                this.Invoke(sd, new object[] { messageStatus, message });
+                PrintDelegate sd = this.PrintMessage;
+                this.Invoke(sd, messageStatus, message);
             }
             else
             {
-                // Setup the cells and add the row
-                using (DataGridViewRow row = new DataGridViewRow())
+                // Set up the cells and add the row
+                using DataGridViewRow row = new DataGridViewRow();
+                using DataGridViewImageWithAltTextCell statusCell = new DataGridViewImageWithAltTextCell();
+                switch (messageStatus)
                 {
-                    using (DataGridViewImageWithAltTextCell statusCell = new DataGridViewImageWithAltTextCell())
-                    {
-                        switch (messageStatus)
-                        {
-                            case Status.Pass:
-                                statusCell.AltText = "Pass";
-                                statusCell.Value = Properties.Resources.Pass;
-                                break;
-                            case Status.Fail:
-                                statusCell.AltText = "Fail";
-                                statusCell.Value = Properties.Resources.Fail;
-                                break;
-                            case Status.Info:
-                            default:
-                                statusCell.AltText = "Info";
-                                statusCell.Value = Properties.Resources.Info;
-                                break;
-                            case Status.Recommendation:
-                                statusCell.AltText = "Recommendation";
-                                statusCell.Value = Properties.Resources.Recommendation;
-                                break;
-                        }
-
-                        row.Cells.Add(statusCell);
-                    }
-
-                    using (DataGridViewCell noticeCell = new DataGridViewTextBoxCell())
-                    {
-                        noticeCell.Value = message;
-                        row.Cells.Add(noticeCell);
-                    }
-
-                    this.results.Rows.Add(row);
+                    case Status.Pass:
+                        statusCell.AltText = "Pass";
+                        statusCell.Value = Properties.Resources.Pass;
+                        break;
+                    case Status.Fail:
+                        statusCell.AltText = "Fail";
+                        statusCell.Value = Properties.Resources.Fail;
+                        break;
+                    case Status.Info:
+                    default:
+                        statusCell.AltText = "Info";
+                        statusCell.Value = Properties.Resources.Info;
+                        break;
+                    case Status.Recommendation:
+                        statusCell.AltText = "Recommendation";
+                        statusCell.Value = Properties.Resources.Recommendation;
+                        break;
                 }
+
+                row.Cells.Add(statusCell);
+
+                using DataGridViewCell noticeCell = new DataGridViewTextBoxCell();
+                noticeCell.Value = message;
+                row.Cells.Add(noticeCell);
+
+                this.results.Rows.Add(row);
             }
         }
 
@@ -107,24 +100,17 @@ namespace MySqlTuner
         /// <param name="complete">if set to <c>true</c>, the progress bar is complete; otherwise <c>false</c>.</param>
         public override void ProgressComplete(bool complete)
         {
-            // See if this is is called from another thread
+            // See if this is called from another thread
             if (this.results.InvokeRequired)
             {
-                ProgressBarCompleteDelegate sd = new ProgressBarCompleteDelegate(this.ProgressComplete);
-                this.Invoke(sd, new object[] { complete });
+                ProgressBarCompleteDelegate sd = this.ProgressComplete;
+                this.Invoke(sd, complete);
             }
             else
             {
                 this.progessBarMain.Style = ProgressBarStyle.Continuous;
-                if (complete)
-                {
-                    this.progessBarMain.Value = 100;
-                }
-                else
-                {
-                    // An arbitrary number to show incompletion
-                    this.progessBarMain.Value = 40;
-                }
+                // 40 is an arbitrary number to show non-completion
+                this.progessBarMain.Value = complete ? 100 : 40;
             }
         }
 

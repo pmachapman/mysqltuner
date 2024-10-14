@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="Status.cs" company="Peter Chapman">
-// Copyright 2012-2022 Peter Chapman. See LICENCE.md for licence details.
+// Copyright 2012-2024 Peter Chapman. See LICENCE.md for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -9,10 +9,10 @@ namespace MySqlTuner
     /// <summary>
     /// The status message type.
     /// </summary>
-    public enum Status : int
+    public enum Status
     {
         /// <summary>
-        /// The notice is a information notice.
+        /// The notice is an information notice.
         /// </summary>
         Info = 0,
 

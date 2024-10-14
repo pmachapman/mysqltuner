@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
 // <copyright file="MySqlServer.cs" company="Peter Chapman">
-// Copyright 2012-2022 Peter Chapman. See LICENCE.md for licence details.
+// Copyright 2012-2024 Peter Chapman. See LICENCE.md for licence details.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -22,12 +22,12 @@ namespace MySqlTuner
         /// <summary>
         /// Failure messages during server load.
         /// </summary>
-        private readonly List<string> failureMessages = new List<string>();
+        private readonly List<string> failureMessages = [];
 
         /// <summary>
         /// Track whether Dispose has been called.
         /// </summary>
-        private bool disposed = false;
+        private bool disposed;
 
         /// <summary>
         /// Initialises a new instance of the <see cref="MySqlServer"/> class.
@@ -93,10 +93,10 @@ namespace MySqlTuner
             }
 
             // Setup variables
-            this.EngineCount = new Dictionary<string, long>();
-            this.EngineStatistics = new Dictionary<string, long>();
-            this.Status = new Dictionary<string, string>();
-            this.Variables = new Dictionary<string, string>();
+            this.EngineCount = [];
+            this.EngineStatistics = [];
+            this.Status = [];
+            this.Variables = [];
         }
 
         /// <summary>
@@ -243,33 +243,30 @@ namespace MySqlTuner
                     // TODO: Calculate the indexes from the file system
                     return 0;
                 }
-                else if (this.Version.Major >= 5)
+
+                if (this.Version.Major >= 5)
                 {
                     long totalMyIsamIndexes;
-                    string sql = "SELECT IFNULL(SUM(INDEX_LENGTH),0) FROM information_schema.TABLES WHERE TABLE_SCHEMA NOT IN ('information_schema') AND ENGINE = 'MyISAM'";
-                    using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
+                    const string sql = "SELECT IFNULL(SUM(INDEX_LENGTH),0) FROM information_schema.TABLES WHERE TABLE_SCHEMA NOT IN ('information_schema') AND ENGINE = 'MyISAM'";
+                    using MySqlCommand command = new MySqlCommand(sql, this.Connection);
+                    object scalar = command.ExecuteScalar();
+                    if (scalar != null)
                     {
-                        object scalar = command.ExecuteScalar();
-                        if (scalar != null)
-                        {
-                            if (!long.TryParse(scalar.ToString(), out totalMyIsamIndexes))
-                            {
-                                totalMyIsamIndexes = 0;
-                            }
-                        }
-                        else
+                        if (!long.TryParse(scalar.ToString(), out totalMyIsamIndexes))
                         {
                             totalMyIsamIndexes = 0;
                         }
                     }
+                    else
+                    {
+                        totalMyIsamIndexes = 0;
+                    }
 
                     return totalMyIsamIndexes;
                 }
-                else
-                {
-                    // Unsupported version
-                    return 0;
-                }
+
+                // Unsupported version
+                return 0;
             }
         }
 
@@ -295,7 +292,7 @@ namespace MySqlTuner
         /// <value>
         /// The variables.
         /// </value>
-        public Dictionary<string, string> Variables { get; private set; }
+        public Dictionary<string, string> Variables { get; }
 
         /// <summary>
         /// Gets the server version.
@@ -331,13 +328,7 @@ namespace MySqlTuner
         /// <summary>
         /// Closes this instance.
         /// </summary>
-        public void Close()
-        {
-            if (this.Connection != null)
-            {
-                this.Connection.Close();
-            }
-        }
+        public void Close() => this.Connection?.Close();
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -347,7 +338,7 @@ namespace MySqlTuner
             this.Dispose(true);
 
             // This object will be cleaned up by the Dispose method.
-            // Therefore, you should call GC.SupressFinalize to
+            // Therefore, you should call GC.SuppressFinalize to
             // take this object off the finalization queue
             // and prevent finalization code for this object
             // from executing a second time.
@@ -360,7 +351,7 @@ namespace MySqlTuner
         public void Open()
         {
             // Create the connection string
-            MySqlConnectionStringBuilder connectionStringBuilder = new MySqlConnectionStringBuilder()
+            MySqlConnectionStringBuilder connectionStringBuilder = new MySqlConnectionStringBuilder
             {
                 Server = this.Host,
                 Port = this.Port,
@@ -369,7 +360,7 @@ namespace MySqlTuner
                 ConnectionTimeout = 30, // Stop any time out issues
                 DefaultCommandTimeout = 0,
 #if !NET20
-                SslMode = this.UseSsl ? MySqlSslMode.Preferred : MySqlSslMode.None,
+                SslMode = this.UseSsl ? MySqlSslMode.Preferred : MySqlSslMode.Disabled,
 #endif
             };
 
@@ -385,15 +376,10 @@ namespace MySqlTuner
             }
             catch (Exception ex)
             {
-                if (ex is MySqlException
-                    || ex is NotSupportedException
-                    || ex is AuthenticationException)
+                if (ex is MySqlException or NotSupportedException or AuthenticationException)
                 {
                     // Dispose of the connection
-                    if (this.Connection != null)
-                    {
-                        this.Connection.Dispose();
-                    }
+                    this.Connection?.Dispose();
 
                     // Set connection to null so it cannot be used
                     this.Connection = null;
@@ -423,7 +409,7 @@ namespace MySqlTuner
 #pragma warning restore IDE0079 // Remove unnecessary suppression
         public void Load()
         {
-            // We need to initiate at least one query so that our data is useable
+            // We need to initiate at least one query so that our data is usable
             string sql = "SELECT VERSION()";
             using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
             {
@@ -562,38 +548,34 @@ namespace MySqlTuner
                 // check SHOW ENGINES and set corresponding old style variables.
                 // Also works around MySQL bug #59393 wrt. skip-innodb
                 sql = "SHOW ENGINES";
-                using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
+                using MySqlCommand command = new MySqlCommand(sql, this.Connection);
+                using MySqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
                 {
-                    using (MySqlDataReader reader = command.ExecuteReader())
+                    string engine = GetStringFromReader(reader, 0).ToLower(Settings.Culture);
+                    if (engine == "federated" || engine == "blackhole")
                     {
-                        while (reader.Read())
-                        {
-                            string engine = GetStringFromReader(reader, 0).ToLower(Settings.Culture);
-                            if (engine == "federated" || engine == "blackhole")
-                            {
-                                engine += "_engine";
-                            }
-                            else if (engine == "berkeleydb")
-                            {
-                                engine = "bdb";
-                            }
+                        engine += "_engine";
+                    }
+                    else if (engine == "berkeleydb")
+                    {
+                        engine = "bdb";
+                    }
 
-                            string value = GetStringFromReader(reader, 1);
-                            if (value == "DEFAULT")
-                            {
-                                value = "YES";
-                            }
+                    string value = GetStringFromReader(reader, 1);
+                    if (value == "DEFAULT")
+                    {
+                        value = "YES";
+                    }
 
-                            string key = "have_" + engine;
-                            if (this.Variables.ContainsKey(key))
-                            {
-                                this.Variables[key] = value;
-                            }
-                            else
-                            {
-                                this.Variables.Add(key, value);
-                            }
-                        }
+                    string key = "have_" + engine;
+                    if (this.Variables.ContainsKey(key))
+                    {
+                        this.Variables[key] = value;
+                    }
+                    else
+                    {
+                        this.Variables.Add(key, value);
                     }
                 }
             }
@@ -602,17 +584,13 @@ namespace MySqlTuner
             try
             {
                 sql = "SHOW SLAVE STATUS";
-                using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
+                using MySqlCommand command = new MySqlCommand(sql, this.Connection);
+                using MySqlDataReader reader = command.ExecuteReader();
+                if (reader.Read())
                 {
-                    using (MySqlDataReader reader = command.ExecuteReader())
+                    for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        if (reader.Read())
-                        {
-                            for (int i = 0; i < reader.FieldCount; i++)
-                            {
-                                this.ReplicationStatus.Add(reader.GetName(i), GetStringFromReader(reader, i));
-                            }
-                        }
+                        this.ReplicationStatus.Add(reader.GetName(i), GetStringFromReader(reader, i));
                     }
                 }
             }
@@ -627,15 +605,11 @@ namespace MySqlTuner
             try
             {
                 sql = "SHOW SLAVE HOSTS";
-                using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
+                using MySqlCommand command = new MySqlCommand(sql, this.Connection);
+                using MySqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
                 {
-                    using (MySqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            this.Slaves++;
-                        }
-                    }
+                    this.Slaves++;
                 }
             }
             catch (MySqlException)
@@ -713,7 +687,7 @@ namespace MySqlTuner
             {
                 // MySQL < 5 servers take a lot of work to get table sizes
                 // Now we build a database list, and loop through it to get storage engine stats for tables
-                List<string> databases = new List<string>();
+                List<string> databases = [];
                 sql = "SHOW DATABASES";
                 using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
                 {
@@ -727,8 +701,8 @@ namespace MySqlTuner
                 }
 
                 // Reset the engine variables
-                this.EngineCount = new Dictionary<string, long>();
-                this.EngineStatistics = new Dictionary<string, long>();
+                this.EngineCount = [];
+                this.EngineStatistics = [];
                 this.FragmentedTables = 0;
 
                 // Go through every database
@@ -737,68 +711,64 @@ namespace MySqlTuner
                     if (database != "information_schema" && database != "performance_schema")
                     {
                         sql = "SHOW TABLE STATUS FROM `" + database + "`";
-                        using (MySqlCommand command = new MySqlCommand(sql, this.Connection))
+                        using MySqlCommand command = new MySqlCommand(sql, this.Connection);
+                        using MySqlDataReader reader = command.ExecuteReader();
+                        while (reader.Read())
                         {
-                            using (MySqlDataReader reader = command.ExecuteReader())
+                            string key = GetStringFromReader(reader, 1);
+                            long size;
+                            long dataFree;
+                            if (this.Version.Major == 3 || (this.Version.Major == 4 && this.Version.Minor == 0))
                             {
-                                while (reader.Read())
+                                // MySQL 3.23/4.0 keeps Data_Length in the 6th column
+                                if (!long.TryParse(GetStringFromReader(reader, 5), out size))
                                 {
-                                    string key = GetStringFromReader(reader, 1);
-                                    long size;
-                                    long dataFree;
-                                    if (this.Version.Major == 3 || (this.Version.Major == 4 && this.Version.Minor == 0))
-                                    {
-                                        // MySQL 3.23/4.0 keeps Data_Length in the 6th column
-                                        if (!long.TryParse(GetStringFromReader(reader, 5), out size))
-                                        {
-                                            size = 0;
-                                        }
-
-                                        if (!long.TryParse(GetStringFromReader(reader, 8), out dataFree))
-                                        {
-                                            dataFree = 0;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // MySQL 4.1+ keeps Data_Length in the 7th column
-                                        if (!long.TryParse(GetStringFromReader(reader, 6), out size))
-                                        {
-                                            size = 0;
-                                        }
-
-                                        if (!long.TryParse(GetStringFromReader(reader, 9), out dataFree))
-                                        {
-                                            dataFree = 0;
-                                        }
-                                    }
-
-                                    // Add the size
-                                    if (this.EngineStatistics.ContainsKey(key))
-                                    {
-                                        this.EngineStatistics[key] += size;
-                                    }
-                                    else
-                                    {
-                                        this.EngineStatistics.Add(key, size);
-                                    }
-
-                                    // Add the table count
-                                    if (this.EngineCount.ContainsKey(key))
-                                    {
-                                        this.EngineCount[key]++;
-                                    }
-                                    else
-                                    {
-                                        this.EngineCount.Add(key, 1);
-                                    }
-
-                                    // See if this table is fragmented
-                                    if (dataFree > 0)
-                                    {
-                                        this.FragmentedTables++;
-                                    }
+                                    size = 0;
                                 }
+
+                                if (!long.TryParse(GetStringFromReader(reader, 8), out dataFree))
+                                {
+                                    dataFree = 0;
+                                }
+                            }
+                            else
+                            {
+                                // MySQL 4.1+ keeps Data_Length in the 7th column
+                                if (!long.TryParse(GetStringFromReader(reader, 6), out size))
+                                {
+                                    size = 0;
+                                }
+
+                                if (!long.TryParse(GetStringFromReader(reader, 9), out dataFree))
+                                {
+                                    dataFree = 0;
+                                }
+                            }
+
+                            // Add the size
+                            if (this.EngineStatistics.ContainsKey(key))
+                            {
+                                this.EngineStatistics[key] += size;
+                            }
+                            else
+                            {
+                                this.EngineStatistics.Add(key, size);
+                            }
+
+                            // Add the table count
+                            if (this.EngineCount.ContainsKey(key))
+                            {
+                                this.EngineCount[key]++;
+                            }
+                            else
+                            {
+                                this.EngineCount.Add(key, 1);
+                            }
+
+                            // See if this table is fragmented
+                            if (dataFree > 0)
+                            {
+                                this.FragmentedTables++;
                             }
                         }
                     }
@@ -818,7 +788,7 @@ namespace MySqlTuner
         ///   </para>
         ///   <para>
         /// If disposing equals false, the method has been called by the
-        /// runtime from inside the destructor and you should not reference
+        /// runtime from inside the destructor, and you should not reference
         /// other objects. Only unmanaged resources can be disposed.
         ///   </para>
         /// </remarks>
@@ -852,6 +822,19 @@ namespace MySqlTuner
         /// Returns an empty string on DBNull.
         /// NOTE: If I didn't need .Net 2.0 compatibility, I would write this as an extension method.
         /// </remarks>
-        private static string GetStringFromReader(MySqlDataReader reader, int i) => reader.IsDBNull(i) ? string.Empty : reader.GetString(i);
+        private static string GetStringFromReader(MySqlDataReader reader, int i)
+        {
+            string readerString;
+            try
+            {
+                readerString = reader.GetString(i);
+            }
+            catch
+            {
+                readerString = reader[i].ToString();
+            }
+
+            return reader.IsDBNull(i) ? string.Empty : readerString;
+        }
     }
 }
